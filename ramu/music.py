@@ -97,8 +97,20 @@ class Tone(BasicTone):
     def __str__( self ):
         """return glyph + octave as string"""
         return self.glyph + str(self.octave)
-    def __cmp__(self, other):
-        return cmp(self.index, other.index)
+    def __hash__(self):
+        return hash(self.index)
+    def __eq__(self, other):
+        return self.index == other.index
+    def __ne__(self, other):
+        return self.index != other.index
+    def __gt__(self, other):
+        return self.index > other.index
+    def __ge__(self, other):
+        return self.index >= other.index
+    def __lt__(self, other):
+        return self.index < other.index
+    def __le__(self, other):
+        return self.index <= other.index
     
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Note data
@@ -122,8 +134,21 @@ class Note:
         self.duration = float(duration)
         assert(0.0 <= strength <= 1.0)
         self.strength = float(strength)
+    def __eq__(self, other):
+        return self.tone == other.tone and self.duration == other.duration and self.strength == other.strength
+    def __ne__(self, other):
+        return not self == other
+    def __gt__(self, other):
+        return NotImplemented
+    def __ge__(self, other):
+        return NotImplemented
+    def __lt__(self, other):
+        return NotImplemented
+    def __le__(self, other):
+        return NotImplemented
 
 class SequenceNote:
+    # XXX should derive this from Note
     """A SequenceNote is associated with a tone, a start time, a
     duration (in seconds) and a strength value (0.0 - 1.0)."""
     def __init__( self, note_tone, time=0.0, duration=0.25, strength=0.75 ):
@@ -168,6 +193,21 @@ class Scale:
             for i in scale_index_offsets[self.name]:
                 ii = self.tonic.index + j*TONES_PER_CHROMATIC_OCTAVE + i
                 self.tones.append(Tone(ii))
+    def __hash__(self):
+        return hash(hash(self.tonic) + hash(self.name))
+    def __eq__(self, other):
+        # XXX different octaves
+        return self.tonic == other.tonic and self.name == other.name
+    def __ne__(self, other):
+        return not self == other
+    def __gt__(self, other):
+        return NotImplemented
+    def __ge__(self, other):
+        return NotImplemented
+    def __lt__(self, other):
+        return NotImplemented
+    def __le__(self, other):
+        return NotImplemented
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 # Chord data
@@ -198,6 +238,25 @@ class Chord:
         self.tones = []
         for j in range(octaves):
             tones_per_octave = len(self.scale.tones)
+            #print chord_index_offsets
+            #print self.scale.tones
             for i in chord_index_offsets[self.name]:
+                #print i
                 ii = self.scale.tones[i].index + j*TONES_PER_CHROMATIC_OCTAVE
                 self.tones.append(Tone(ii))
+    def __hash__(self):
+        return hash(hash(self.scale) + hash(self.name))
+    def __eq__(self, other):
+        # XXX different octaves
+        return self.scale == other.scale and self.name == other.name
+    def __ne__(self, other):
+        return not self == other
+    def __gt__(self, other):
+        return NotImplemented
+    def __ge__(self, other):
+        return NotImplemented
+    def __lt__(self, other):
+        return NotImplemented
+    def __le__(self, other):
+        return NotImplemented
+
