@@ -26,6 +26,8 @@ from ctypes import *
 # hook up our library.  it's sitting right next to this file
 pth = os.path.dirname(__file__)
 lm = cdll.LoadLibrary(pth+'/libosxmidi.dylib')
+# experimented with the setup.py way of doing things & this failed.
+#lm = cdll.LoadLibrary(pth+'/libosxmidi.so')
 # create our prototypes
 #   now()
 lm.now.restype = c_ulonglong
