@@ -110,7 +110,7 @@ class FrettedString:
         self.fret      = 0         # the fret that is currently pressed
         self.moving    = False     # have we been plucked?
     def __del__(self):
-        self.silence(0)
+        self.silence(self.channel.now)
     def press(self, time, fret):
         """press the given fret, turning off the current note."""
         self.silence(time)
@@ -124,7 +124,7 @@ class FrettedString:
         self.moving = False
     def pluck(self, time, strength ):
         """pluck the string, stopping the last note & sending the current note"""
-        self.silence(time-1L)
+        self.silence(time-self.channel.ulp)
         if self.fret >= 0:
             self.channel.note_on(time,
                                  music.Tone(self.base_note.index + self.fret),

@@ -21,6 +21,7 @@
 import os
 import math
 from ctypes import *
+from .. import channel
 
 # ======================================================================
 # hook up our library.  it's sitting right next to this file
@@ -53,32 +54,42 @@ MIDI_SYSTEM_EXCLUSIVE = 0xf0
 MIDI_CONTROL_ALL_NOTES_OFF = 0x7b
 
 # ======================================================================
-# XXX inherit from Channel?  no note() override?
-class MidiChannel:
-    def __init__(self,channel=0,default_strength=0.5):
-        self.channel = channel
-        self.default_strength = default_strength
-    def note_on(self,time,tone,strength=None):
-        if strength == None:
-            strength = self.default_strength
-        assert(0.0<=strength<=1.0)
-        velocity = int(127*strength)
-        send_midi_event(time,MIDI_NOTE_ON,self.channel,tone.index,velocity)
-    def note_off(self,time,tone,strength=None):
-        if strength == None:
-            strength = self.default_strength
-        assert(0.0<=strength<=1.0)
-        velocity = int(127*strength)
-        send_midi_event(time,MIDI_NOTE_OFF,self.channel,tone.index,velocity)
-    def note(self,time,seqnote):
-        self.note_on(seqnote.time,
-                     seqnote.tone.index,
-                     seqnote.strength)
-        self.note_off(seqnote.time + seqnote.duration,
-                      seqnote.tone.index,
-                      seqnote.strength)
+class MidiChannel(channel.Channel):
+    def __init__(self,midi_channel_id=0,rhythm=None):
+        #super(MidiChannel,self).__init__(rhythm)
+        channel.Channel.__init__(self,rhythm)
+        self._midi_channel_id = midi_channel_id
+        #self.default_strength = default_strength
+        self.one_second = one_s
+        self.ulp = 1L
 
+    def note_on(self,time,tone,strength):
+        #if strength == None:
+        #    strength = self.default_strength
+        channel.Channel.note_on(self,time,tone,strength)
+        assert(0.0<=strength<=1.0)
+        velocity = int(127*strength)
+        send_midi_event(time,MIDI_NOTE_ON,self._midi_channel_id,tone.index,velocity)
+    def note_off(self,time,tone,strength):
+        #if strength == None:
+        #    strength = self.default_strength
+        assert(0.0<=strength<=1.0)
+        velocity = int(127*strength)
+        send_midi_event(time,MIDI_NOTE_OFF,self._midi_channel_id,tone.index,velocity)
+    def note(self,seqnote):
+        self.note_on(long(self.beat_to_time(seqnote.beat)),
+                     seqnote.tone,
+                     seqnote.strength)
+        self.note_off(long(self.beat_to_time(seqnote.beat + seqnote.duration)),
+                      seqnote.tone,
+                      seqnote.strength)
+        
+    def get_now(self):
+        return now()
+    now = property(get_now)
+        
 # ======================================================================
+# XXX part of channel?
 def all_notes_off():
     send_midi_event(now(),MIDI_CONTROL_MODE,0,MIDI_CONTROL_ALL_NOTES_OFF,0)
 

@@ -18,7 +18,13 @@
 # 02110-1301, USA.
 #
 __doc__ = """
-blah blah
+Music is made in a hierarchy:
+  Tones are a way to denote the frequency of the sound
+  Scales contain Tones
+  Chords are derived from Scales
+
+  Notes are Tones + duration time
+  SequenceNotes are Tones + duration + start time
 """
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -41,6 +47,7 @@ circle_of_fifths = [
     "c", "g", "d", "a", "e", "b", "g-", "d-", "a-", "e-", "b-", "f"
     ]
 
+# A5 = 440.0 Hz
 def chromatic_tone_to_frequency(index):
     """convert chromatic tone index to frequency"""
     return ( 440.0 * 2.0**( (index - 69) / float(TONES_PER_CHROMATIC_OCTAVE)))
@@ -151,10 +158,10 @@ class SequenceNote:
     # XXX should derive this from Note
     """A SequenceNote is associated with a tone, a start time, a
     duration (in seconds) and a strength value (0.0 - 1.0)."""
-    def __init__( self, note_tone, time=0.0, duration=0.25, strength=0.75 ):
+    def __init__( self, note_tone, beat=0.0, duration=0.25, strength=0.75 ):
         assert(type(note_tone) == type(Tone(0)))
         self.tone     = note_tone
-        self.time     = float(time)
+        self.beat     = float(beat)
         self.duration = float(duration)
         assert(0.0 <= strength <= 1.0)
         self.strength = float(strength)
@@ -260,3 +267,12 @@ class Chord:
     def __le__(self, other):
         return NotImplemented
 
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+# Rhythm class
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+class Rhythm:
+    def __init__(self, beats_per_minute):
+        self._beats_per_minute = beats_per_minute
+    def get_beats_per_second(self):
+        return self._beats_per_minute/60.0
+    beats_per_second = property(get_beats_per_second)
