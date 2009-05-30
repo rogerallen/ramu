@@ -17,40 +17,75 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
+__doc__ = """
+ramu.channel contains the Channel class.  This module is intended
+for diagnostic usage when a real channel is not available.
+"""
 
-# a simple-stupid way to see notes. Override for actual use
 class Channel:
-    def __init__(self,rhythm=None):
+    """Channel is a container that takes in tones and timing
+    information and produces output.  Normally, it would produce
+    musical output via a MIDI channel or synthesizer.  In this case it
+    is just a simple-stupid way to see notes printed to stdout.
+    Normally, you would override for actual use.
+    """
+    def __init__(self):
+        """Create the channel and initialize the values of
+        Channel.one_second and Channel.ulp.
+
+        Channel.now -- a value that is updated whenever a time value
+        is passed into the class.  Normally it would continuously
+        update to be the current time.
+
+        Channel.one_second -- a conversion helps convert
+        floating-point time where 1 second === 1.0 to the channel's
+        preferred accounting.
+
+        Channel.ulp -- unit-of-least-precision.  Any times smaller
+        than that value are 'too small to be measured'.
+        """
         self._now = 0.0
         self.one_second = 1.0
         self.ulp = 1/1000.0 # tiny number
-        self.set_rhythm(rhythm)
 
-    def set_rhythm(self,rhythm):
-        self._rhythm = rhythm
-        self._rhythm_start_time = self.now  
+    def start_note(self,time,tone,strength):
+        """Start playing a note.
 
-    def beat_to_time(self,beat):
-        return self._rhythm_start_time + self.one_second*beat/self._rhythm.beats_per_second
-
-    def note_on(self,time,tone,strength):
-        print "%f note_on %d %f" % (time,tone.index,strength)
+        Keyword arguments:
+        time     -- time to start playing in seconds.  1.0 === 1 second
+        tone     -- the tone to play
+        strength -- strength to apply to playing the note [0.0,1.0]
+        """
+        assert(0.0<=strength<=1.0)
+        print "%f start_note %d %f" % (time,tone.index,strength)
         self._now = time
 
-    def note_off(self,time,tone,strength):
-        print "%f note_off %d %f" % (time,tone.index,strength)
+    def stop_note(self,time,tone,strength):
+        """Stop playing a note.
+
+        Keyword arguments:
+        time     -- time to stop playing in seconds.  1.0 === 1 second
+        tone     -- the tone to play
+        strength -- strength to apply to stopping the note [0.0,1.0]
+        """
+        assert(0.0<=strength<=1.0)
+        print "%f stop_note  %d %f" % (time,tone.index,strength)
         self._now = time
 
-    def note(self,seqnote):
-        self._now = self.beat_to_time(seqnote.beat)
-        print "%f(%f) note %d %f %f" % (self._now,
-                                        seqnote.beat,
-                                        seqnote.tone.index,
-                                        seqnote.strength,
-                                        seqnote.duration)
-        self._now += self.beat_to_time(seqnote.beat + seqnote.duration)
+    def play_note(self,start,stop,tone,strength):
+        """Play a note.
+
+        Keyword arguments:
+        start    -- time to start playing in seconds.  1.0 === 1 second
+        stop     -- time to stop playing in seconds. 1.0 === 1 second
+        tone     -- the tone to play
+        strength -- strength to apply to playing the note [0.0,1.0]
+        """
+        self.start_note(start,tone,strength)
+        self.stop_note(stop,tone,strength)
 
     def get_now(self):
+        """return current time. Normally you should use the now property"""
         return self._now
     now = property(get_now)
 

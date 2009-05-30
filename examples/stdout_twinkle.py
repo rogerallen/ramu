@@ -27,7 +27,8 @@ def mk_note(t,g):
     duration = (len(g)-1)
     return SequenceNote(Tone(glyph,octave),t,duration)
 
-rh = Rhythm(120)
-c = Channel(rh)
-for n in mk_seq_notes(full_seq):
-    c.note(n)
+rhy = Rhythm(120)
+chn = Channel()
+seq = Sequence(rhy)
+seq.set_sequence(mk_seq_notes(full_seq))
+seq.play(chn.now,chn)

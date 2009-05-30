@@ -18,6 +18,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
+__doc__ = """
+ramu.osxmidi.channel contains the Channel class and other midi
+information for use as a virtual midi channel on an Mac OS X machine.
+
+ramu.osxmidi.channel.now() -- returns a long integer of the current
+time in nanoseconds.
+
+ramu.osxmidi.send_midi_event() -- sends a midi event onto the virtual channel.
+  time       -- long time to send event in nanoseconds
+  event      -- byte event type
+  channel_id -- byte midi channel id
+  event1     -- byte additional midi event info
+  event2     -- byte additional midi event info
+
+"""
 import os
 import math
 from ctypes import *
@@ -55,35 +70,45 @@ MIDI_CONTROL_ALL_NOTES_OFF = 0x7b
 
 # ======================================================================
 class Channel(channel.Channel):
-    def __init__(self,midi_channel_id=0,rhythm=None):
-        #super(MidiChannel,self).__init__(rhythm)
-        channel.Channel.__init__(self,rhythm)
+    """Channel is a container that takes in tones and timing
+    information and produces output on a Mac OS X virtual midi interface.
+    """
+    def __init__(self,midi_channel_id=0):
+        """xxx
+        """
+        #super(MidiChannel,self).__init__(rhythm) XXX
+        channel.Channel.__init__(self)
         self._midi_channel_id = midi_channel_id
-        #self.default_strength = default_strength
-        self.one_second = one_s
-        self.ulp = 1L
+        self.one_second       = one_s
+        self.ulp              = 1L
 
-    def note_on(self,time,tone,strength):
-        #if strength == None:
-        #    strength = self.default_strength
-        channel.Channel.note_on(self,time,tone,strength)
+    def start_note(self,time,tone,strength):
+        """Start playing a note.
+
+        Keyword arguments:
+        time     -- time to start playing in seconds.  1.0 === 1 second
+        tone     -- the tone to play
+        strength -- strength to apply to playing the note [0.0,1.0]
+        """
         assert(0.0<=strength<=1.0)
         velocity = int(127*strength)
-        send_midi_event(time,MIDI_NOTE_ON,self._midi_channel_id,tone.index,velocity)
-    def note_off(self,time,tone,strength):
-        #if strength == None:
-        #    strength = self.default_strength
+        localtime = long(time)
+        print "%d start_note %d %f" % (localtime,tone.index,strength)
+        send_midi_event(localtime,
+                        MIDI_NOTE_ON,
+                        self._midi_channel_id,
+                        tone.index,
+                        velocity)
+    def stop_note(self,time,tone,strength):
         assert(0.0<=strength<=1.0)
         velocity = int(127*strength)
-        send_midi_event(time,MIDI_NOTE_OFF,self._midi_channel_id,tone.index,velocity)
-    def note(self,seqnote):
-        self.note_on(long(self.beat_to_time(seqnote.beat)),
-                     seqnote.tone,
-                     seqnote.strength)
-        self.note_off(long(self.beat_to_time(seqnote.beat + seqnote.duration)),
-                      seqnote.tone,
-                      seqnote.strength)
-        
+        localtime = long(time)
+        print "%d stop_note  %d %f" % (localtime,tone.index,strength)
+        send_midi_event(localtime,
+                        MIDI_NOTE_OFF,
+                        self._midi_channel_id,
+                        tone.index,
+                        velocity)
     def get_now(self):
         return now()
     now = property(get_now)

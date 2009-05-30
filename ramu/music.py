@@ -19,6 +19,7 @@
 #
 __doc__ = """
 Music is made in a hierarchy:
+  A frequency XXX
   Tones are a way to denote the frequency of the sound
   Scales contain Tones
   Chords are derived from Scales
@@ -268,7 +269,7 @@ class Chord:
         return NotImplemented
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-# Rhythm class
+# Rhythm class XXX TimeSignature ???
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 class Rhythm:
     def __init__(self, beats_per_minute):
@@ -276,3 +277,23 @@ class Rhythm:
     def get_beats_per_second(self):
         return self._beats_per_minute/60.0
     beats_per_second = property(get_beats_per_second)
+
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+# Sequence - a sequence of notes
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+class Sequence:
+    """A Sequence is a container for ordered notes with an associated
+    description of the tempo and time signature
+    """
+    def __init__(self,rhythm=None):
+        self.seq = []
+        self._rhythm = rhythm
+    def set_sequence(self,sequence):
+        self.seq = sequence
+    def play(self,start_time,channel):
+        """play this sequence through the channel"""
+        for note in self.seq:
+            start = start_time + channel.one_second * note.beat / self._rhythm.beats_per_second
+            end = start_time - channel.ulp + channel.one_second * (note.beat + note.duration) / self._rhythm.beats_per_second
+            channel.play_note(start,end,note.tone,note.strength)
+

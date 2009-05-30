@@ -32,11 +32,12 @@ def mk_note(t,g):
     duration = (len(g)-1)
     return SequenceNote(Tone(glyph,octave),t,duration)
 
-rh = Rhythm(120)
+rhy = Rhythm(120)
 waitfor("Make sure GarageBand is running, then hit return")
 from ramu.osxmidi.channel import Channel
-c = Channel(0,rh)
+chn = Channel(0)
 waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
-for n in mk_seq_notes(full_seq):
-    c.note(n)
+seq = Sequence(rhy)
+seq.set_sequence(mk_seq_notes(full_seq))
+seq.play(chn.now,chn)
 waitfor("hit return when you want to quit")
