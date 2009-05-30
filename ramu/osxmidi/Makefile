@@ -33,5 +33,5 @@ libosxmidi.so: osxmidi.c
 	gcc -Wl,-F. -bundle -undefined dynamic_lookup -arch i386 -arch ppc ./osxmidi.o -o libosxmidi.so -framework CoreMIDI -framework CoreAudio -framework CoreFoundation
 
 clean:
-	rm -f libosxmidi.dylib osxmidi.o osxmidi.pyc
+	rm -f *.dylib *.o *.so *.pyc
 

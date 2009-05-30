@@ -13,8 +13,8 @@ def MajChord(x):
     return Chord(Scale(Tone(x)))
 
 waitfor("Make sure GarageBand is running, then hit return")
-from ramu.osxmidi.osxmidi import MidiChannel
-chan = MidiChannel()
+from ramu.osxmidi.channel import Channel
+chan = Channel()
 g = guitar.Guitar(chan)
 
 waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")

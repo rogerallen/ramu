@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# ramu.osxmidi - connect python to mac midi
+# ramu.osxmidi.channel - connect python to mac midi
 # Copyright (C) 2009 Roger Allen (rallen@gmail.com)
 #
 # This program is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ MIDI_SYSTEM_EXCLUSIVE = 0xf0
 MIDI_CONTROL_ALL_NOTES_OFF = 0x7b
 
 # ======================================================================
-class MidiChannel(channel.Channel):
+class Channel(channel.Channel):
     def __init__(self,midi_channel_id=0,rhythm=None):
         #super(MidiChannel,self).__init__(rhythm)
         channel.Channel.__init__(self,rhythm)

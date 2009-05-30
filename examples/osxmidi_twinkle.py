@@ -34,8 +34,8 @@ def mk_note(t,g):
 
 rh = Rhythm(120)
 waitfor("Make sure GarageBand is running, then hit return")
-from ramu.osxmidi.osxmidi import MidiChannel
-c = MidiChannel(0,rh)
+from ramu.osxmidi.channel import Channel
+c = Channel(0,rh)
 waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 for n in mk_seq_notes(full_seq):
     c.note(n)
