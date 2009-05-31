@@ -74,13 +74,18 @@ class Channel(channel.Channel):
     information and produces output on a Mac OS X virtual midi interface.
     """
     def __init__(self,midi_channel_id=0):
-        """xxx
+        """Initialize the Channel by sending an innocuous event.
         """
         #super(MidiChannel,self).__init__(rhythm) XXX
         channel.Channel.__init__(self)
         self._midi_channel_id = midi_channel_id
-        self.one_second       = one_s
-        self.ulp              = 1L
+        self._one_second       = one_s
+        self._ulp              = 1L
+        send_midi_event(now(),
+                        MIDI_NOTE_OFF,
+                        self._midi_channel_id,
+                        0,
+                        0)
 
     def start_note(self,time,tone,strength):
         """Start playing a note.
@@ -92,31 +97,39 @@ class Channel(channel.Channel):
         """
         assert(0.0<=strength<=1.0)
         velocity = int(127*strength)
-        localtime = long(time)
+        localtime = long(time * self._one_second)
         print "%d start_note %d %f" % (localtime,tone.index,strength)
         send_midi_event(localtime,
                         MIDI_NOTE_ON,
                         self._midi_channel_id,
                         tone.index,
                         velocity)
+
     def stop_note(self,time,tone,strength):
+        """Stop playing a note.
+
+        Keyword arguments:
+        time     -- time to stop playing in seconds.  1.0 === 1 second
+                    this time is reduced 1 ulp to keep it clear when
+                    a note ends and when another begins in the channel.
+        tone     -- the tone to play
+        strength -- strength to apply to stopping the note [0.0,1.0]
+        """
         assert(0.0<=strength<=1.0)
         velocity = int(127*strength)
-        localtime = long(time)
+        localtime = long(time*self._one_second) - self._ulp
         print "%d stop_note  %d %f" % (localtime,tone.index,strength)
         send_midi_event(localtime,
                         MIDI_NOTE_OFF,
                         self._midi_channel_id,
                         tone.index,
                         velocity)
+
     def get_now(self):
-        return now()
+        """return the current time where 1.0 == 1 second"""
+        return float(now()*1.0/self._one_second)
     now = property(get_now)
         
-# ======================================================================
-# XXX part of channel?
-def all_notes_off():
-    send_midi_event(now(),MIDI_CONTROL_MODE,0,MIDI_CONTROL_ALL_NOTES_OFF,0)
-
-# cause initialization
-all_notes_off()
+    def all_notes_off(self):
+        """turn off all notes"""
+        send_midi_event(now(),MIDI_CONTROL_MODE,0,MIDI_CONTROL_ALL_NOTES_OFF,0)

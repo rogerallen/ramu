@@ -37,16 +37,16 @@ class Channel:
         is passed into the class.  Normally it would continuously
         update to be the current time.
 
-        Channel.one_second -- a conversion helps convert
+        Channel._one_second -- a conversion helps convert
         floating-point time where 1 second === 1.0 to the channel's
         preferred accounting.
 
-        Channel.ulp -- unit-of-least-precision.  Any times smaller
+        Channel._ulp -- unit-of-least-precision.  Any times smaller
         than that value are 'too small to be measured'.
         """
         self._now = 0.0
-        self.one_second = 1.0
-        self.ulp = 1/1000.0 # tiny number
+        self._one_second = 1.0
+        self._ulp = 1/1000.0 # tiny number
 
     def start_note(self,time,tone,strength):
         """Start playing a note.
@@ -57,7 +57,8 @@ class Channel:
         strength -- strength to apply to playing the note [0.0,1.0]
         """
         assert(0.0<=strength<=1.0)
-        print "%f start_note %d %f" % (time,tone.index,strength)
+        localtime = float(time*self._one_second)
+        print "%f start_note %d %f" % (localtime,tone.index,strength)
         self._now = time
 
     def stop_note(self,time,tone,strength):
@@ -65,11 +66,14 @@ class Channel:
 
         Keyword arguments:
         time     -- time to stop playing in seconds.  1.0 === 1 second
+                    this time is reduced 1 ulp to keep it clear when
+                    a note ends and when another begins in the channel.
         tone     -- the tone to play
         strength -- strength to apply to stopping the note [0.0,1.0]
         """
         assert(0.0<=strength<=1.0)
-        print "%f stop_note  %d %f" % (time,tone.index,strength)
+        localtime = float(time*self._one_second) - self._ulp
+        print "%f stop_note  %d %f" % (localtime,tone.index,strength)
         self._now = time
 
     def play_note(self,start,stop,tone,strength):
@@ -88,4 +92,8 @@ class Channel:
         """return current time. Normally you should use the now property"""
         return self._now
     now = property(get_now)
+
+    def all_notes_off(self):
+        """turn off all notes"""
+        pass # NOP in this channel
 

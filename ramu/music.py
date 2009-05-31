@@ -293,7 +293,7 @@ class Sequence:
     def play(self,start_time,channel):
         """play this sequence through the channel"""
         for note in self.seq:
-            start = start_time + channel.one_second * note.beat / self._rhythm.beats_per_second
-            end = start_time - channel.ulp + channel.one_second * (note.beat + note.duration) / self._rhythm.beats_per_second
+            start = start_time + note.beat/self._rhythm.beats_per_second
+            end   = start_time + (note.beat + note.duration)/self._rhythm.beats_per_second
             channel.play_note(start,end,note.tone,note.strength)
 

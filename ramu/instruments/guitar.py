@@ -124,7 +124,7 @@ class FrettedString:
         self.moving = False
     def pluck(self, time, strength ):
         """pluck the string, stopping the last note & sending the current note"""
-        self.silence(time-self.channel.ulp)
+        self.silence(time)
         if self.fret >= 0:
             self.channel.start_note(time,
                                     music.Tone(self.base_note.index + self.fret),
