@@ -137,10 +137,10 @@ class FrettedString:
 class Guitar:
     # strings E, A, D, G, B, E
     string_notes = [ music.Tone('E',3),
-                     music.Tone('A',4),
+                     music.Tone('A',3),
                      music.Tone('D',4),
                      music.Tone('G',4),
-                     music.Tone('B',5),
+                     music.Tone('B',4),
                      music.Tone('E',5) ]
     def __init__(self, channel):
         """a guitar has 6 FrettedStrings and plays to a osxmidi.Channel"""
