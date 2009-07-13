@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys
 import unittest
+import sets
 sys.path.insert(0,"..")
 from music import *
 
@@ -131,11 +132,27 @@ class TestTone(unittest.TestCase):
         for i in range(12):
             self.assertEqual(Tone(i).glyph, gstr[i])
 
-    def testSets(self):
+    def testSetting(self):
         def tryToSet(t,v):
             t.index = v
         t0 = Tone(60)
         self.assertRaises(AttributeError, tryToSet, t0, 69)
+
+    def testFindScales(self):
+        scale_set = sets.Set(get_scales_with_tones(
+            [Tone('c'),Tone('d'),Tone('e'),Tone('b')]))
+        gold_set = sets.Set([Scale(Tone('c',0)),
+                             Scale(Tone('g',0)),
+                             Scale(Tone('e',0),'minor'),
+                             Scale(Tone('a',0),'minor')])
+        self.assertEqual(scale_set.intersection(gold_set), scale_set)
+    def testFindScales2(self):
+        scale_set = sets.Set(get_scales_with_tones(
+            [Tone('e-'),Tone('b-'),Tone('g')],['major']))
+        gold_set = sets.Set([Scale(Tone('e-',0)),
+                             Scale(Tone('a-',0)),
+                             Scale(Tone('b-',0))])
+        self.assertEqual(scale_set.intersection(gold_set), scale_set)
 
 if __name__ == "__main__":
     unittest.main()

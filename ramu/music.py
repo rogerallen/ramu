@@ -27,6 +27,7 @@ Music is made in a hierarchy:
   Notes are Tones + duration time
   SequenceNotes are Tones + duration + start time
 """
+import sets
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # glypho = glyphs + octaves
@@ -103,6 +104,9 @@ class Tone(BasicTone):
         return int( self.index / TONES_PER_CHROMATIC_OCTAVE )
     octave = property(get_octave)
     def __str__( self ):
+        """return glyph + octave as string"""
+        return self.glyph + str(self.octave)
+    def __repr__( self ):
         """return glyph + octave as string"""
         return self.glyph + str(self.octave)
     def __hash__(self):
@@ -201,6 +205,8 @@ class Scale(object):
             for i in scale_index_offsets[self.name]:
                 ii = self.tonic.index + j*TONES_PER_CHROMATIC_OCTAVE + i
                 self.tones.append(Tone(ii))
+    def __repr__(self):
+        return repr(self.tonic)[:-1] + "_" + self.name
     def __hash__(self):
         return hash(hash(self.tonic) + hash(self.name))
     def __eq__(self, other):
@@ -217,6 +223,30 @@ class Scale(object):
     def __le__(self, other):
         return NotImplemented
 
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+def get_scales_with_tones(tones,scale_names=['major','minor']):
+    """return a list of all scales that contain the given tones.  Note
+    that we compare via glyphs rather than tones in order to avoid
+    comparing the octaves.
+    
+    Keyword arguments:
+    tones       -- list of tones to consider
+    scale_names -- only look within the scale_names type of scales.
+    """
+    assert(type(tones)==type(list()))
+    assert(type(scale_names)==type(list()))
+    scales = []
+    toneset = sets.Set([x.glyph for x in tones])
+    for n in scale_names:
+        assert(n in scale_index_offsets.keys())
+        for i in range(TONES_PER_CHROMATIC_OCTAVE):
+            scale = Scale(Tone(i),n)
+            scaleset = sets.Set([x.glyph for x in scale.tones])
+            if toneset.intersection(scaleset) == toneset:
+               scales.append(scale)
+    return scales
+            
+        
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 # Chord data
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
