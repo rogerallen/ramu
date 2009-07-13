@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys
 import unittest
-sys.path.append("..")
+sys.path.insert(0,"..")
 from music import *
 
 # ======================================================================
@@ -132,10 +132,10 @@ class TestTone(unittest.TestCase):
             self.assertEqual(Tone(i).glyph, gstr[i])
 
     def testSets(self):
-        # XXX prove that you cannot set index/glyph/tone
+        def tryToSet(t,v):
+            t.index = v
         t0 = Tone(60)
-        # XXX on my mac, this doesn't seem to work as expected...
-        # XXX self.assertRaises(AttributeError, t0.index, 69)
+        self.assertRaises(AttributeError, tryToSet, t0, 69)
 
 if __name__ == "__main__":
     unittest.main()

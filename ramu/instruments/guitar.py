@@ -130,8 +130,6 @@ class FrettedString:
                                     music.Tone(self.base_note.index + self.fret),
                                     strength)
             self.moving = True
-        else:
-            self.fret = 0
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 class Guitar:
@@ -143,7 +141,7 @@ class Guitar:
                      music.Tone('B',4),
                      music.Tone('E',5) ]
     def __init__(self, channel):
-        """a guitar has 6 FrettedStrings and plays to a osxmidi.Channel"""
+        """a guitar has 6 FrettedStrings and plays to a ramu.channel"""
         self.channel = channel
         self.strings = [FrettedString(note,channel) for note in self.string_notes]
     def press_fret(self, time, string_index, fret):
@@ -158,7 +156,12 @@ class Guitar:
         """press the frets for a chord"""
         self.press_frets(time, chord_strings[chord])
     def silence(self, time):
+        """silence all strings by muting all frets"""
         self.press_frets(time,[-1,-1,-1,-1,-1,-1])
+    def mute(self,time):
+        """silence, without the permanent effect on frets"""
+        cur_frets = [ s.fret for s in self.strings ]
+        self.press_frets(time,cur_frets)
     def strum(self, time, time_per_string, direction=STRUM_DOWN,
               start_string=0, num_strings=6, strength=0.80 ):
         """strum the guitar at a given time, moving up or down,
@@ -175,4 +178,5 @@ class Guitar:
         end_string = max(-1, min(end_string, 6))
         for i in range(start_string,end_string,incr):
             self.strings[i].pluck(time, strength)
-            time += time_per_string
+            if self.strings[i].moving:
+                time += time_per_string

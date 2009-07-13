@@ -61,7 +61,7 @@ def glphyo_to_chromatic_tone_index(glyph,octave):
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # BasicTone
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class BasicTone:
+class BasicTone(object):
     """Base class for describing the frequency of a sound.
     Not alot here at the moment"""
     def __init__(self,frequency):
@@ -133,7 +133,7 @@ def bpm_note_divisor_to_seconds(bpm,note_divisor):
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Note class
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class Note:
+class Note(object):
     """A note is associated with a tone, a duration (in seconds) and
     a strength value (0.0 - 1.0)."""
     def __init__( self, note_tone, duration=0.25, strength=0.75 ):
@@ -155,7 +155,7 @@ class Note:
     def __le__(self, other):
         return NotImplemented
 
-class SequenceNote:
+class SequenceNote(object):
     # XXX should derive this from Note
     """A SequenceNote is associated with a tone, a start time, a
     duration (in seconds) and a strength value (0.0 - 1.0)."""
@@ -189,7 +189,7 @@ scale_index_offsets = {
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Scale class
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class Scale:
+class Scale(object):
     """Scales are made up of tones"""
     def __init__( self, tonic, name="major", octaves=1 ):
         assert(type(tonic) == type(Tone(0)))
@@ -237,7 +237,7 @@ chord_index_offsets = {
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Chord class
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class Chord:
+class Chord(object):
     def __init__( self, chord_scale, name="5th", octaves=1 ):
         assert(type(chord_scale) == type(Scale(Tone.fromGlypho('c'))))
         self.scale  = chord_scale
@@ -271,7 +271,7 @@ class Chord:
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Rhythm class XXX TimeSignature ???
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class Rhythm:
+class Rhythm(object):
     def __init__(self, beats_per_minute):
         self._beats_per_minute = beats_per_minute
     def get_beats_per_second(self):
@@ -281,7 +281,7 @@ class Rhythm:
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Sequence - a sequence of notes
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-class Sequence:
+class Sequence(object):
     """A Sequence is a container for ordered notes with an associated
     description of the tempo and time signature
     """
