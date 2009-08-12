@@ -21,7 +21,7 @@
 #
 import sys
 # uncomment to work with local directory
-sys.path.insert(0,"..")
+#sys.path.insert(0,"..")
 from ramu.music import *
 
 def usage():
