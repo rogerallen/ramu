@@ -19,7 +19,7 @@
 #
 __doc__ = """
 Music is made in a hierarchy:
-  A frequency XXX
+  Starting from a basic tone only with frequency.
   Tones are a way to denote the frequency of the sound
   Scales contain Tones
   Chords are derived from Scales
@@ -57,7 +57,10 @@ def chromatic_tone_to_frequency(index):
 def glphyo_to_chromatic_tone_index(glyph,octave):
     assert(glyph.lower() in chromatic_glyphs)
     v = chromatic_glyphs.index( glyph.lower() ) % TONES_PER_CHROMATIC_OCTAVE
-    return TONES_PER_CHROMATIC_OCTAVE * octave + v
+    o = octave
+    if octave == None:
+        o = 0
+    return TONES_PER_CHROMATIC_OCTAVE * o + v
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # BasicTone
@@ -77,18 +80,24 @@ class Tone(BasicTone):
     * 0 = the lowest note ( glyph C, octave 0 )
     * 60 = middle C       ( glyph C, octave 5 )
     * 69 = A440           ( glyph A, octave 5 )
-    This probably wants to be ChromaticTone, but that name is too long
+    This probably wants to be ChromaticTone, but that name is too long.
+    If the note is initialized only by a glyph, the Tone is 'canonical'
+    or without an octave.  This allows for abstract calculations of
+    theory, rather than a Tone that can be played.
     """
-    def __init__( self, index_or_glyph, octave=5 ):
+    def __init__( self, index_or_glyph, octave=None ):
         """basic way to initialize a class is via an index"""
         if type(index_or_glyph) == type(0):
+            assert(octave == None)
             index = index_or_glyph
+            self.canonical = (index < TONES_PER_CHROMATIC_OCTAVE)
         else:
             index = glphyo_to_chromatic_tone_index(index_or_glyph,octave)
+            self.canonical = (octave == None)
         BasicTone.__init__(self,chromatic_tone_to_frequency(index))
         self._index = index
     @classmethod
-    def fromGlypho(cls, glyph, octave=5 ):
+    def fromGlypho(cls, glyph, octave=None ):
         """initializes a ChromaticTone from a glyph-octave pair"""
         index = glphyo_to_chromatic_tone_index(glyph,octave)
         return cls(index)
@@ -101,14 +110,19 @@ class Tone(BasicTone):
     glyph = property(get_glyph)
     def get_octave( self ):
         """return the octave of index"""
+        if self.canonical:
+            return None
         return int( self.index / TONES_PER_CHROMATIC_OCTAVE )
     octave = property(get_octave)
     def __str__( self ):
         """return glyph + octave as string"""
-        return self.glyph + str(self.octave)
+        if self.canonical:
+            octave_str = ""
+        else:
+            octave_str = str(self.octave)
+        return self.glyph + octave_str
     def __repr__( self ):
-        """return glyph + octave as string"""
-        return self.glyph + str(self.octave)
+        return str(self)
     def __hash__(self):
         return hash(self.index)
     def __eq__(self, other):
@@ -123,6 +137,16 @@ class Tone(BasicTone):
         return self.index < other.index
     def __le__(self, other):
         return self.index <= other.index
+    def __add__(self, other):
+        if type(other) == type(Tone(0)):
+            offset = other.index
+        elif type(other) == type(0):
+            offset = other
+        new_index = self.index + offset
+        if self.canonical:
+            new_index %= TONES_PER_CHROMATIC_OCTAVE
+            return Tone(chromatic_glyphs[new_index])
+        return Tone(new_index)
     
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Note data
@@ -161,6 +185,7 @@ class Note(object):
 
 class SequenceNote(object):
     # XXX should derive this from Note
+    # XXX beat AND duration? this looks fishy...
     """A SequenceNote is associated with a tone, a start time, a
     duration (in seconds) and a strength value (0.0 - 1.0)."""
     def __init__( self, note_tone, beat=0.0, duration=0.25, strength=0.75 ):
@@ -175,19 +200,25 @@ class SequenceNote(object):
 # Scale data
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-# name to chromatic index
+# name to chromatic index dictionary, one octave's worth of indices
 scale_index_offsets = {
+    # 12 tones per scale
     "chromatic"  : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
-    "major"      : [ 0, 2, 4, 5, 7, 9, 11 ],
-    "minor"      : [ 0, 2, 3, 5, 7, 8, 10 ],
-    "aeolian"    : [ 0, 2, 3, 5, 7, 8, 10 ],
+    # 11,10,9,8 tones per scale ?
+    # 7 tones per scale
+    "major"      : [ 0,    2,    4, 5,    7,    9,     11 ],
+    "minor"      : [ 0,    2, 3,    5,    7, 8,    10 ],
+    "aeolian"    : [ 0,    2, 3,    5,    7, 8,    10 ],
     # "dorian"     : [], # xxx
-    "ionian"     : [ 0, 2, 4, 5, 7, 9, 11 ],
+    "ionian"     : [ 0,    2,    4, 5,    7,    9,     11 ],
     #"locrian"    : [], # xxx
     #"lydian"     : [], # xxx
     #"mixolydian" : [], # xxx
     #"phrygian"   : [], # xxx
-    "pentatonic" : [ 0, 2, 5, 7, 9 ],
+    # 6 notes per scale xxx
+    "hexatonic"  : [ 0,    2,    4,    6,   8,     10     ],
+    # 5 notes per scale
+    "pentatonic" : [ 0,    2,       5,    7,    9 ],
     }
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -195,18 +226,31 @@ scale_index_offsets = {
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 class Scale(object):
     """Scales are made up of tones"""
-    def __init__( self, tonic, name="major", octaves=1 ):
+    def __init__(self, tonic, name="major", octaves=1):
         assert(type(tonic) == type(Tone(0)))
         self.tonic = tonic
         assert(name in scale_index_offsets.keys())
         self.name  = name
         self.tones = []
+        self.octaves = octaves
         for j in range(octaves):
             for i in scale_index_offsets[self.name]:
-                ii = self.tonic.index + j*TONES_PER_CHROMATIC_OCTAVE + i
-                self.tones.append(Tone(ii))
+                self.tones.append(self.tonic + j*TONES_PER_CHROMATIC_OCTAVE + i)
+    def get_glyphs(self):
+        return ([x.glyph for x in self.tones])
+    glyphs = property(get_glyphs)
+    def intersect(self,other):
+        """return the number of notes that are the same in both scales"""
+        set0 = sets.Set(self.tones)
+        set1 = sets.Set(other.tones)
+        return sorted([x for x in set0.intersection(set1)])
+    def __str__(self):
+        s = str(self.tonic) + "_" + self.name
+        if self.octaves > 1:
+            s += "_" + str(self.octaves) + "octaves"
+        return s
     def __repr__(self):
-        return repr(self.tonic)[:-1] + "_" + self.name
+        return str(self)
     def __hash__(self):
         return hash(hash(self.tonic) + hash(self.name))
     def __eq__(self, other):
@@ -236,16 +280,15 @@ def get_scales_with_tones(tones,scale_names=['major','minor']):
     assert(type(tones)==type(list()))
     assert(type(scale_names)==type(list()))
     scales = []
-    toneset = sets.Set([x.glyph for x in tones])
+    toneset = sets.Set(tones)
     for n in scale_names:
         assert(n in scale_index_offsets.keys())
         for i in range(TONES_PER_CHROMATIC_OCTAVE):
             scale = Scale(Tone(i),n)
-            scaleset = sets.Set([x.glyph for x in scale.tones])
+            scaleset = sets.Set(scale.tones)
             if toneset.intersection(scaleset) == toneset:
                scales.append(scale)
     return scales
-            
         
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 # Chord data

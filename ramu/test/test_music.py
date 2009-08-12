@@ -76,6 +76,19 @@ class TestScale(unittest.TestCase):
         self.failUnless(t0 != t2)
         t3 = Scale(Tone('a'),'minor')
         self.failUnless(t0 != t3)
+
+    def testString(self):
+        self.assertEqual('c_major',str(Scale(Tone('c'))))
+        self.assertEqual('c4_minor',repr(Scale(Tone('c',4),'minor')))
+        self.assertEqual('c4_major_3octaves',str(Scale(Tone('c',4),'major',3)))
+
+    def testIntersect(self):
+        t0 = Scale(Tone('c'))
+        t1 = Scale(Tone('g'))
+        t2 = Scale(Tone('b'))
+        gold_set = sets.Set([Tone('b'),Tone('e')])
+        self.assertEqual(len(t0.intersect(t1)),6)
+        self.assertEqual(sets.Set(t0.intersect(t2)),gold_set)
 # XXX multiple octaves
 # XXX test assert <,<=,>,>=
 
@@ -92,6 +105,7 @@ class TestTone(unittest.TestCase):
         self.assertEqual('a',t.glyph)
         self.assertEqual(5,t.octave)
         self.assertEqual('a5',str(t))
+        self.assertEqual('a5',repr(t))
 
     def testA220(self):
         t = Tone(69-TONES_PER_CHROMATIC_OCTAVE)
@@ -100,16 +114,24 @@ class TestTone(unittest.TestCase):
         self.assertEqual('a',t.glyph)
         self.assertEqual(4,t.octave)
         self.assertEqual('a4',str(t))
+        self.assertEqual('a4',repr(t))
+
+    def testCanonical(self):
+        t = Tone('c') # octaveless, canonical note
+        self.assertEqual(t.glyph,'c')
+        self.assertEqual(t.octave,None)
+        self.assertEqual('c',str(t))
+        self.assertEqual('c',repr(t))
 
     def testC(self):
-        t0 = Tone.fromGlypho('c')
+        t0 = Tone.fromGlypho('c',5)
         t1 = Tone.fromGlypho('C',5)
         self.assertEqual(t0,t1)
         t2 = Tone(60)
         self.assertEqual(t0,t2)
 
     def testEqual(self):
-        t0 = Tone('c')
+        t0 = Tone('c',5)
         t1 = Tone('C',5)
         self.assertEqual(t0,t1)
         self.failUnless(t0 == t1)
@@ -125,6 +147,11 @@ class TestTone(unittest.TestCase):
         t0 = Tone.fromGlypho("A",4)
         t1 = Tone.fromGlypho("A#",4)
         self.failUnless(t0<t1)
+
+    def testCanonicalCmp(self):
+        t0 = Tone('c')
+        t1 = Tone('a')
+        self.failUnless(t0<t1)
 # XXX test <,<=,>,>=
 
     def testGlyphs(self):
@@ -138,21 +165,38 @@ class TestTone(unittest.TestCase):
         t0 = Tone(60)
         self.assertRaises(AttributeError, tryToSet, t0, 69)
 
+    def testAdd(self):
+        t0 = Tone(60)
+        t1 = Tone(5)
+        t2 = t0 + t1
+        t3 = t0 + 5
+        t4 = Tone(65)
+        self.assertEqual(t2,t4)
+        self.assertEqual(t3,t4)
+
+    def testAddCanonical(self):
+        t0 = Tone('c')
+        t1 = t0 + 7
+        t2 = Tone('g')
+        self.assertEqual(t1,t2)
+        self.assertEqual(t1.canonical,True)
+
     def testFindScales(self):
         scale_set = sets.Set(get_scales_with_tones(
             [Tone('c'),Tone('d'),Tone('e'),Tone('b')]))
-        gold_set = sets.Set([Scale(Tone('c',0)),
-                             Scale(Tone('g',0)),
-                             Scale(Tone('e',0),'minor'),
-                             Scale(Tone('a',0),'minor')])
-        self.assertEqual(scale_set.intersection(gold_set), scale_set)
+        gold_set = sets.Set([Scale(Tone('c')),
+                             Scale(Tone('g')),
+                             Scale(Tone('e'),'minor'),
+                             Scale(Tone('a'),'minor')])
+        self.assertEqual(scale_set.intersection(gold_set), gold_set)
+
     def testFindScales2(self):
         scale_set = sets.Set(get_scales_with_tones(
             [Tone('e-'),Tone('b-'),Tone('g')],['major']))
-        gold_set = sets.Set([Scale(Tone('e-',0)),
-                             Scale(Tone('a-',0)),
-                             Scale(Tone('b-',0))])
-        self.assertEqual(scale_set.intersection(gold_set), scale_set)
+        gold_set = sets.Set([Scale(Tone('e-')),
+                             Scale(Tone('a-')),
+                             Scale(Tone('b-'))])
+        self.assertEqual(scale_set.intersection(gold_set), gold_set)
 
 if __name__ == "__main__":
     unittest.main()
