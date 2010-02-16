@@ -45,7 +45,7 @@ UInt64 now();
 void 
 _init(MIDIEndpointRef *endpoint) {
     // create client and midi ports                                             
-    MIDIClientRef midi_client = NULL;
+    MIDIClientRef midi_client = (MIDIClientRef)(uintptr_t)NULL;
     MIDIClientCreate( CFSTR( "osxmidi" ), NULL, NULL, &midi_client );
     MIDISourceCreate( midi_client, CFSTR("osxmidi output port"), endpoint );
 }
@@ -53,8 +53,8 @@ _init(MIDIEndpointRef *endpoint) {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void 
 _send(Byte* data, int count, UInt64 time) {
-    static MIDIEndpointRef endpoint = NULL;
-    if(endpoint == NULL) {
+    static MIDIEndpointRef endpoint = (MIDIClientRef)(uintptr_t)NULL;
+    if(endpoint == (MIDIClientRef)(uintptr_t)NULL) {
         _init(&endpoint);
     }
     Byte buffer[64];  // not quite sure how big this should be, but this works

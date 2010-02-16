@@ -15,9 +15,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
+# I confirmed that this works
+# MYARCH=-arch i386
+# as long as you also call python with VERSIONER_PYTHON_PREFER_32_BIT=yes set
+THE_ARCH=-arch x86_64
 libosxmidi.dylib: osxmidi.c
-	gcc -fPIC -c osxmidi.c
-	ld -dylib -o libosxmidi.dylib \
+	gcc ${THE_ARCH} -fPIC -c osxmidi.c
+	ld ${THE_ARCH} -dylib -o libosxmidi.dylib \
 	  -framework CoreMIDI -framework CoreAudio -framework CoreFoundation \
 	  -lc osxmidi.o
 
@@ -34,4 +38,3 @@ libosxmidi.so: osxmidi.c
 
 clean:
 	rm -f *.dylib *.o *.so *.pyc
-
