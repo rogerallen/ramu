@@ -38,7 +38,7 @@ TESTING:
   cd examples
 
 This prints out the notes that would play "Twinkle, Twinkle Little
-Star" in a format that 
+Star" in a format that you can read.
 
   python twinkle.py stdout
 
