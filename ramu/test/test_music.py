@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import sys
 import unittest
-import sets
 sys.path.insert(0,"..")
 from music import *
 
@@ -86,9 +85,9 @@ class TestScale(unittest.TestCase):
         t0 = Scale(Tone('c'))
         t1 = Scale(Tone('g'))
         t2 = Scale(Tone('b'))
-        gold_set = sets.Set([Tone('b'),Tone('e')])
+        gold_set = set([Tone('b'),Tone('e')])
         self.assertEqual(len(t0.intersect(t1)),6)
-        self.assertEqual(sets.Set(t0.intersect(t2)),gold_set)
+        self.assertEqual(set(t0.intersect(t2)),gold_set)
 # XXX multiple octaves
 # XXX test assert <,<=,>,>=
 
@@ -182,18 +181,18 @@ class TestTone(unittest.TestCase):
         self.assertEqual(t1.canonical,True)
 
     def testFindScales(self):
-        scale_set = sets.Set(get_scales_with_tones(
+        scale_set = set(get_scales_with_tones(
             [Tone('c'),Tone('d'),Tone('e'),Tone('b')]))
-        gold_set = sets.Set([Scale(Tone('c')),
+        gold_set = set([Scale(Tone('c')),
                              Scale(Tone('g')),
                              Scale(Tone('e'),'minor'),
                              Scale(Tone('a'),'minor')])
         self.assertEqual(scale_set.intersection(gold_set), gold_set)
 
     def testFindScales2(self):
-        scale_set = sets.Set(get_scales_with_tones(
+        scale_set = set(get_scales_with_tones(
             [Tone('e-'),Tone('b-'),Tone('g')],['major']))
-        gold_set = sets.Set([Scale(Tone('e-')),
+        gold_set = set([Scale(Tone('e-')),
                              Scale(Tone('a-')),
                              Scale(Tone('b-'))])
         self.assertEqual(scale_set.intersection(gold_set), gold_set)

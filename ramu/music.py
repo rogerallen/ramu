@@ -27,7 +27,6 @@ Music is made in a hierarchy:
   Notes are Tones + duration time
   SequenceNotes are Tones + duration + start time
 """
-import sets
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # glypho = glyphs + octaves
@@ -241,8 +240,8 @@ class Scale(object):
     glyphs = property(get_glyphs)
     def intersect(self,other):
         """return the number of notes that are the same in both scales"""
-        set0 = sets.Set(self.tones)
-        set1 = sets.Set(other.tones)
+        set0 = set(self.tones)
+        set1 = set(other.tones)
         return sorted([x for x in set0.intersection(set1)])
     def __str__(self):
         s = str(self.tonic) + "_" + self.name
@@ -280,12 +279,12 @@ def get_scales_with_tones(tones,scale_names=['major','minor']):
     assert(type(tones)==type(list()))
     assert(type(scale_names)==type(list()))
     scales = []
-    toneset = sets.Set(tones)
+    toneset = set(tones)
     for n in scale_names:
         assert(n in scale_index_offsets.keys())
         for i in range(TONES_PER_CHROMATIC_OCTAVE):
             scale = Scale(Tone(i),n)
-            scaleset = sets.Set(scale.tones)
+            scaleset = set(scale.tones)
             if toneset.intersection(scaleset) == toneset:
                scales.append(scale)
     return scales
