@@ -198,22 +198,34 @@ class SequenceNote(object):
 # name to chromatic index dictionary, one octave's worth of indices
 scale_index_offsets = {
     # 12 tones per scale
-    "chromatic"  : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
+    "chromatic"         : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
     # 11,10,9,8 tones per scale ?
-    # 7 tones per scale
-    "major"      : [ 0,    2,    4, 5,    7,    9,     11 ],
-    "minor"      : [ 0,    2, 3,    5,    7, 8,    10 ],
-    "aeolian"    : [ 0,    2, 3,    5,    7, 8,    10 ],
-    # "dorian"     : [], # xxx
-    "ionian"     : [ 0,    2,    4, 5,    7,    9,     11 ],
-    #"locrian"    : [], # xxx
-    #"lydian"     : [], # xxx
-    #"mixolydian" : [], # xxx
-    #"phrygian"   : [], # xxx
-    # 6 notes per scale xxx
-    "hexatonic"  : [ 0,    2,    4,    6,   8,     10     ],
+    # 7 tones per scale (the normal major, minor scales)
+    #Ionian 1 1 ½ 1 1 1 ½ Major
+    "major"             : [ 0,    2,    4, 5,    7,    9,     11 ],
+    "ionian"            : [ 0,    2,    4, 5,    7,    9,     11 ],
+    #Dorian 1 ½ 1 1 1 ½ 1
+    "dorian"            : [ 0,    2, 3,    5,    7,    9, 10     ],
+    #Phrygian ½ 1 1 1 ½ 1 1
+    "phrygian"          : [ 0, 1,    3,    5,    7, 8,    10     ],
+    #Lydian 1 1 1 ½ 1 1 ½
+    "lydian"            : [ 0,    2,    4,    6, 7,    9,     11 ],
+    #Mixolydian 1 1 ½ 1 1 ½ 1
+    "mixolydian"        : [ 0,    2,    4, 5,    7,    9, 10     ],
+    #Aeolian 1 ½ 1 1 ½ 1 1 Natural minor
+    "minor"             : [ 0,    2, 3,    5,    7, 8,    10     ],
+    "natural minor"     : [ 0,    2, 3,    5,    7, 8,    10     ],
+    "melodic down minor": [ 0,    2, 3,    5,    7, 8,    10     ],
+    "aeolian"           : [ 0,    2, 3,    5,    7, 8,    10     ],
+    "harmonic minor"    : [ 0,    2, 3,    5,    7, 8,        11 ],
+    "melodic up minor"  : [ 0,    2, 3,    5,    7,    9,     11 ],
+    #Locrian ½ 1 1 ½ 1 1 1
+    "locrian"           : [ 0, 1,    3,    5, 6,    8,    10     ],
+    # 6 notes per scale
+    "hexatonic"         : [ 0,    2,    4,    6,   8,     10     ],
+    "whole tone"        : [ 0,    2,    4,    6,   8,     10     ],
     # 5 notes per scale
-    "pentatonic" : [ 0,    2,       5,    7,    9 ],
+    "pentatonic"        : [ 0,    2,       5,    7,    9 ],
     }
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
