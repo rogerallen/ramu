@@ -27,6 +27,8 @@ Music is made in a hierarchy:
   Notes are Tones + duration time
   SequenceNotes are Tones + duration + start time
 """
+from math import floor
+from time import sleep
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # glypho = glyphs + octaves
@@ -183,17 +185,11 @@ class Note(object):
         return NotImplemented
 
 class SequenceNote(object):
-    # XXX should derive this from Note
-    # XXX beat AND duration? this looks fishy...
-    """A SequenceNote is associated with a tone, a start time, a
-    duration (in seconds) and a strength value (0.0 - 1.0)."""
-    def __init__( self, note_tone, beat=0.0, duration=0.25, strength=0.75 ):
-        assert(type(note_tone) == type(Tone(0)))
-        self.tone     = note_tone
-        self.beat     = float(beat)
-        self.duration = float(duration)
-        assert(0.0 <= strength <= 1.0)
-        self.strength = float(strength)
+    """A SequenceNote is a Note that has a start time in beats from the
+    start and a note.duration is measured in beats, not seconds."""
+    def __init__(self, beat, note):
+        self.beat = float(beat)
+        self.note = note
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Scale data
@@ -341,14 +337,20 @@ class Chord(object):
         return NotImplemented
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-# Rhythm class XXX TimeSignature ???
+# Rhythm class
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 class Rhythm(object):
-    def __init__(self, beats_per_minute):
-        self._beats_per_minute = beats_per_minute
+    def __init__(self, beats_per_minute, beats_per_measure=4):
+        self.beats_per_minute = beats_per_minute
+        self.beats_per_measure = beats_per_measure
     def get_beats_per_second(self):
-        return self._beats_per_minute/60.0
+        return self.beats_per_minute/60.0
     beats_per_second = property(get_beats_per_second)
+    def get_measure(cur_time):
+        measure = cur_time / self.beats_per_second / self.beats_per_measure
+        return floor(measure)
+    def get_beat(cur_time):
+        return cur_time/self.beats_per_second
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Sequence - a sequence of notes
@@ -358,14 +360,37 @@ class Sequence(object):
     description of the tempo and time signature
     """
     def __init__(self,rhythm=None):
-        self.seq = []
+        self._seq = []
         self._rhythm = rhythm
-    def set_sequence(self,sequence):
-        self.seq = sequence
+    def append(self,note):
+        """Append a Note to the end of the current sequence"""
+        assert(type(note) == type(Note(Tone(0))))
+        try:
+            next_beat = self._seq[-1].beat + self._seq[-1].note.duration
+        except IndexError:
+            next_beat = 0
+        seq_note = SequenceNote(next_beat,note)
+        self._seq.append(seq_note)
     def play(self,start_time,channel):
-        """play this sequence through the channel"""
-        for note in self.seq:
-            start = start_time + note.beat/self._rhythm.beats_per_second
-            end   = start_time + (note.beat + note.duration)/self._rhythm.beats_per_second
-            channel.play_note(start,end,note.tone,note.strength)
-
+        """play this sequence through the channel asynchronously.  Send
+        the notes and return."""
+        for seq_note in self._seq:
+            start = start_time + seq_note.beat/self._rhythm.beats_per_second
+            end   = start_time + (seq_note.beat + seq_note.note.duration)/self._rhythm.beats_per_second
+            channel.play_note(start, end,
+                              seq_note.note.tone, seq_note.note.strength)
+    def play_and_wait(self,start_time,channel):
+        """play this sequence through the channel, return when it finishes."""
+        dt = 1
+        processing_time = 0.1
+        t1 = channel.now + dt - processing_time
+        for seq_note in self._seq:
+            start = start_time + seq_note.beat/self._rhythm.beats_per_second
+            end   = start_time + (seq_note.beat + seq_note.note.duration)/self._rhythm.beats_per_second
+            channel.play_note(start, end,
+                              seq_note.note.tone, seq_note.note.strength)
+            if end > t1:
+                delta = float(t1 - channel.now)
+                if delta > 0:
+                    sleep(delta)
+                t1 = channel.now + dt - processing_time

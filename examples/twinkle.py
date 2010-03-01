@@ -31,20 +31,12 @@ def waitfor(s):
     print s
     sys.stdin.readline()
 
-def mk_seq_notes(s):
-    t = 0.0
-    lst = []
-    for g in s:
-        lst.append(mk_note(t,g))
-        t += lst[-1].duration
-    return lst
-
-def mk_note(t,g):
+def mk_note(g):
     """g is of the form c4 or aa5"""
     octave   = int(g[-1])
     glyph    = g[0]
     duration = (len(g)-1)
-    return SequenceNote(Tone(glyph,octave),t,duration)
+    return Note(Tone(glyph,octave),duration)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if len(sys.argv) != 2 or not sys.argv[1] in ["stdout", "midi"]:
@@ -68,10 +60,12 @@ if do_midi:
 sub_seq = [ 'c4 c4 g4 g4 a4 a4 gg4'.split(),
             'f4 f4 e4 e4 d4 d4 cc4'.split(),
             'g4 g4 f4 f4 e4 e4 dd4'.split() ]
-full_seq =  sub_seq[0] + sub_seq[1] + sub_seq[2]*2 + sub_seq[0] + sub_seq[1]
-seq = Sequence(Rhythm(144))
-seq.set_sequence(mk_seq_notes(full_seq))
-seq.play(chn.now,chn)
+the_notes = sub_seq[0] + sub_seq[1] + \
+    sub_seq[2]*2 + sub_seq[0] + sub_seq[1]
 
-if do_midi:
-    waitfor("hit return after the song is done (otherwise you'll mess up Garageband)")
+seq = Sequence(Rhythm(144))
+for g in the_notes:
+    seq.append(mk_note(g))
+
+seq.play_and_wait(chn.now,chn)
+
