@@ -97,3 +97,9 @@ class Channel:
         """turn off all notes"""
         pass # NOP in this channel
 
+    # ======================================================================
+    # allow the with statement
+    def __enter__(self):
+        return self
+    def __exit__(self, type, value, traceback):
+        return False

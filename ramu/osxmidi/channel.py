@@ -52,6 +52,8 @@ now = lm.now
 prototype = CFUNCTYPE(c_void_p,c_ulonglong,c_ubyte,c_ubyte,c_ubyte,c_ubyte)
 paramflags = (1,"time",0), (1,"note",0), (1,"channel",0), (1,"data0",0), (1,"data1",0)
 send_midi_event = prototype(("send_midi_event",lm),paramflags)
+#   shutdown_midi()
+shutdown_midi = lm.shutdown_midi
 
 # ======================================================================
 # constants of interest
@@ -133,3 +135,11 @@ class Channel(channel.Channel):
     def all_notes_off(self):
         """turn off all notes"""
         send_midi_event(now(),MIDI_CONTROL_MODE,0,MIDI_CONTROL_ALL_NOTES_OFF,0)
+
+    # ======================================================================
+    # allow the with statement
+    def __enter__(self):
+        return self
+    def __exit__(self, type, value, traceback):
+        shutdown_midi()
+        return False

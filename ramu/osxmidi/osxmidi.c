@@ -40,14 +40,24 @@ void   _init();                                   // "private"
 void   _send(Byte* data, int count, UInt64 time); // "private"
 void   send_midi_event(UInt64 time, Byte event, Byte channel, Byte data0, Byte data1);
 UInt64 now();
+void   shutdown_midi();
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+MIDIClientRef midi_client = (MIDIClientRef)(uintptr_t)NULL;
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void 
 _init(MIDIEndpointRef *endpoint) {
     // create client and midi ports                                             
-    MIDIClientRef midi_client = (MIDIClientRef)(uintptr_t)NULL;
     MIDIClientCreate( CFSTR( "osxmidi" ), NULL, NULL, &midi_client );
     MIDISourceCreate( midi_client, CFSTR("osxmidi output port"), endpoint );
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void 
+shutdown_midi() {
+    // dispose of the client
+    MIDIClientDispose( midi_client );
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

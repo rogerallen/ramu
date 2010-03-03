@@ -190,6 +190,8 @@ class SequenceNote(object):
     def __init__(self, beat, note):
         self.beat = float(beat)
         self.note = note
+    def __cmp__(self,other):
+        return cmp(self.beat,other.beat)
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Scale data
@@ -201,25 +203,18 @@ scale_index_offsets = {
     "chromatic"         : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
     # 11,10,9,8 tones per scale ?
     # 7 tones per scale (the normal major, minor scales)
-    #Ionian 1 1 ½ 1 1 1 ½ Major
     "major"             : [ 0,    2,    4, 5,    7,    9,     11 ],
     "ionian"            : [ 0,    2,    4, 5,    7,    9,     11 ],
-    #Dorian 1 ½ 1 1 1 ½ 1
     "dorian"            : [ 0,    2, 3,    5,    7,    9, 10     ],
-    #Phrygian ½ 1 1 1 ½ 1 1
     "phrygian"          : [ 0, 1,    3,    5,    7, 8,    10     ],
-    #Lydian 1 1 1 ½ 1 1 ½
     "lydian"            : [ 0,    2,    4,    6, 7,    9,     11 ],
-    #Mixolydian 1 1 ½ 1 1 ½ 1
     "mixolydian"        : [ 0,    2,    4, 5,    7,    9, 10     ],
-    #Aeolian 1 ½ 1 1 ½ 1 1 Natural minor
     "minor"             : [ 0,    2, 3,    5,    7, 8,    10     ],
     "natural minor"     : [ 0,    2, 3,    5,    7, 8,    10     ],
     "melodic down minor": [ 0,    2, 3,    5,    7, 8,    10     ],
     "aeolian"           : [ 0,    2, 3,    5,    7, 8,    10     ],
     "harmonic minor"    : [ 0,    2, 3,    5,    7, 8,        11 ],
     "melodic up minor"  : [ 0,    2, 3,    5,    7,    9,     11 ],
-    #Locrian ½ 1 1 ½ 1 1 1
     "locrian"           : [ 0, 1,    3,    5, 6,    8,    10     ],
     # 6 notes per scale
     "hexatonic"         : [ 0,    2,    4,    6,   8,     10     ],
@@ -383,7 +378,13 @@ class Sequence(object):
             next_beat = 0
         seq_note = SequenceNote(next_beat,note)
         self._seq.append(seq_note)
+    def insert(self,note):
+        """Insert a SequenceNote to the proper point"""
+        assert(type(note) == type(SequenceNote(Note(Tone(0)),0)))
+        self._seq.append(note)
+        self._seq.sort()
     def play(self,start_time,channel):
+        # XXX can this be a variant of play_and_wait?
         """play this sequence through the channel asynchronously.  Send
         the notes and return."""
         for seq_note in self._seq:
@@ -393,7 +394,7 @@ class Sequence(object):
                               seq_note.note.tone, seq_note.note.strength)
     def play_and_wait(self,start_time,channel):
         """play this sequence through the channel, return when it finishes."""
-        dt = 1
+        dt = 1 # pass as parameter?
         processing_time = 0.1
         t1 = channel.now + dt - processing_time
         for seq_note in self._seq:
@@ -406,3 +407,12 @@ class Sequence(object):
                 if delta > 0:
                     sleep(delta)
                 t1 = channel.now + dt - processing_time
+        # remember to not return until that final note has finished
+        delta = float(end - channel.now)
+        if delta > 0:
+            sleep(delta)
+    def reverse(self):
+        tmax = self._seq[-1].beat
+        for n in self._seq:
+            n.beat = tmax - n.beat
+        self._seq.sort()

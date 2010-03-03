@@ -51,21 +51,20 @@ if do_midi:
 else:
     from ramu.channel import Channel
 
-chn = Channel()
+with Channel() as chn:
+    if do_midi:
+        waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 
-if do_midi:
-    waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
+    # twinkle's sequence of notes
+    sub_seq = [ 'c4 c4 g4 g4 a4 a4 gg4'.split(),
+                'f4 f4 e4 e4 d4 d4 cc4'.split(),
+                'g4 g4 f4 f4 e4 e4 dd4'.split() ]
+    the_notes = sub_seq[0] + sub_seq[1] + \
+        sub_seq[2]*2 + sub_seq[0] + sub_seq[1]
 
-# twinkle's sequence of notes
-sub_seq = [ 'c4 c4 g4 g4 a4 a4 gg4'.split(),
-            'f4 f4 e4 e4 d4 d4 cc4'.split(),
-            'g4 g4 f4 f4 e4 e4 dd4'.split() ]
-the_notes = sub_seq[0] + sub_seq[1] + \
-    sub_seq[2]*2 + sub_seq[0] + sub_seq[1]
+    seq = Sequence(Rhythm(144))
+    for g in the_notes:
+        seq.append(mk_note(g))
 
-seq = Sequence(Rhythm(144))
-for g in the_notes:
-    seq.append(mk_note(g))
-
-seq.play_and_wait(chn.now,chn)
+    seq.play_and_wait(chn.now,chn)
 
