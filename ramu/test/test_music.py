@@ -145,13 +145,28 @@ class TestTone(unittest.TestCase):
     def testCmp(self):
         t0 = Tone.fromGlypho("A",4)
         t1 = Tone.fromGlypho("A#",4)
+        t11 = Tone.fromGlypho("A#",4)
+        t2 = Tone.fromGlypho("A",5)
         self.failUnless(t0<t1)
+        self.failUnless(t0<=t1)
+        self.failUnless(t1<=t11)
+        self.failUnless(t1==t11)
+        self.failUnless(t2>t1)
+        self.failUnless(t2>=t1)
+        self.failUnless(t2>=t0)
 
     def testCanonicalCmp(self):
         t0 = Tone('c')
         t1 = Tone('a')
+        t11 = Tone('A')
+        t2 = Tone('b')
         self.failUnless(t0<t1)
-# XXX test <,<=,>,>=
+        self.failUnless(t0<=t1)
+        self.failUnless(t1<=t11)
+        self.failUnless(t1==t11)
+        self.failUnless(t2>t1)
+        self.failUnless(t2>=t1)
+        self.failUnless(t2>=t0)
 
     def testGlyphs(self):
         gstr = "c c+ d d+ e f f+ g g+ a a+ b".split()
@@ -196,6 +211,78 @@ class TestTone(unittest.TestCase):
                              Scale(Tone('a-')),
                              Scale(Tone('b-'))])
         self.assertEqual(scale_set.intersection(gold_set), gold_set)
+
+# ======================================================================
+class TestSequence(unittest.TestCase):
+    def testAppendNote(self):
+        s = Sequence(Rhythm(60))
+        s.append(Note(Tone('c',4),1))
+        s.append(Note(Tone('c',5),1))
+        self.assertEqual(s.seq[0], SequenceNote(0., Note(Tone('c',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(1., Note(Tone('c',5),1)))
+
+    def testAppendSequence(self):
+        s = Sequence(Rhythm(60))
+        s.append(Note(Tone('c',4),1))
+        s.append(Note(Tone('c',5),1))
+        s1 = Sequence(Rhythm(120))
+        s1.append(Note(Tone('d',4),1))
+        s1.append(Note(Tone('d',5),1))
+        s.append(s1)
+        self.assertEqual(s.seq[0], SequenceNote(0., Note(Tone('c',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(1., Note(Tone('c',5),1)))
+        self.assertEqual(s.seq[2], SequenceNote(1.5, Note(Tone('d',4),0.5)))
+        self.assertEqual(s.seq[3], SequenceNote(2.0, Note(Tone('d',5),0.5)))
+
+    def testInsertNote(self):
+        s = Sequence(Rhythm(60))
+        s.insert(SequenceNote(3., Note(Tone('c',5),1)))
+        s.insert(SequenceNote(2., Note(Tone('c',4),1)))
+        self.assertEqual(s.seq[0], SequenceNote(2., Note(Tone('c',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(3., Note(Tone('c',5),1)))
+        
+    def testReverse(self):
+        s = Sequence(Rhythm(60))
+        s.append(Note(Tone('c',4),1))
+        s.append(Note(Tone('d',4),1))
+        s.append(Note(Tone('e',4),1))
+        s.append(Note(Tone('f',4),1))
+        s.insert(SequenceNote(5.,Note(Tone('g',4),1)))
+        s.reverse()
+        self.assertEqual(s.seq[0], SequenceNote(0., Note(Tone('g',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(2., Note(Tone('f',4),1)))
+        self.assertEqual(s.seq[2], SequenceNote(3., Note(Tone('e',4),1)))
+        self.assertEqual(s.seq[3], SequenceNote(4., Note(Tone('d',4),1)))
+        self.assertEqual(s.seq[4], SequenceNote(5., Note(Tone('c',4),1)))
+
+    def testFlip(self):
+        s = Sequence(Rhythm(60))
+        s.append(Note(Tone('c',4),1))
+        s.append(Note(Tone('d',4),1))
+        s.append(Note(Tone('e',4),1))
+        s.append(Note(Tone('f',4),1))
+        s.insert(SequenceNote(5.,Note(Tone('g',4),1)))
+        s.flip(Scale(Tone('c',4),'major'))
+        #print s.seq[0].beat, s.seq[0].note.tone, s.seq[0].note.duration
+        self.assertEqual(s.seq[0], SequenceNote(0., Note(Tone('g',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(1., Note(Tone('f',4),1)))
+        self.assertEqual(s.seq[2], SequenceNote(2., Note(Tone('e',4),1)))
+        self.assertEqual(s.seq[3], SequenceNote(3., Note(Tone('d',4),1)))
+        self.assertEqual(s.seq[4], SequenceNote(5., Note(Tone('c',4),1)))
+
+    def testFlip2(self):
+        s = Sequence(Rhythm(60))
+        s.append(Note(Tone('c',4),1))
+        s.append(Note(Tone('d',4),1))
+        s.append(Note(Tone('e',4),1))
+        s.append(Note(Tone('f',4),1))
+        s.insert(SequenceNote(5.,Note(Tone('g',4),1)))
+        s.flip() # chromatic scale
+        self.assertEqual(s.seq[0], SequenceNote(0., Note(Tone('g',4),1)))
+        self.assertEqual(s.seq[1], SequenceNote(1., Note(Tone('f',4),1)))
+        self.assertEqual(s.seq[2], SequenceNote(2., Note(Tone('d#',4),1)))  # !!!
+        self.assertEqual(s.seq[3], SequenceNote(3., Note(Tone('d',4),1)))
+        self.assertEqual(s.seq[4], SequenceNote(5., Note(Tone('c',4),1)))
 
 if __name__ == "__main__":
     unittest.main()

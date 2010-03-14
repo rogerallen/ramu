@@ -49,12 +49,20 @@ with Channel() as chn:
     if do_midi:
         waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 
-    the_notes = [ Note(t,.5) for t in Scale(Tone('c',4),'dorian').tones ]
-    seq = Sequence(Rhythm(192))
+    the_scale = Scale(Tone('c',4),'dorian')
+    the_notes = [ Note(t,.5) for t in the_scale.tones ]
+
+    seq = Sequence(Rhythm(120))
     for t in the_notes:
         seq.append(t)
     rseq = deepcopy(seq)
+    fseq = deepcopy(seq)
     rseq.reverse()
-    seq.append(Note(Tone('c',5),4))
-    seq.play_and_wait(chn.now,chn)
-    rseq.play_and_wait(chn.now,chn)
+    fseq.flip(the_scale)
+
+    all = Sequence(Rhythm(120))
+    all.append(seq)
+    all.append(rseq)
+    all.append(seq)
+    all.append(fseq)
+    all.play_and_wait(chn.now,chn)

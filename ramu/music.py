@@ -1,6 +1,6 @@
 # ramu.music
 #
-# Copyright (C) 2009 Roger Allen (rallen@gmail.com)
+# Copyright (C) 2009-2010 Roger Allen (rallen@gmail.com)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -55,7 +55,7 @@ def chromatic_tone_to_frequency(index):
     """convert chromatic tone index to frequency"""
     return ( 440.0 * 2.0**( (index - 69) / float(TONES_PER_CHROMATIC_OCTAVE)))
 
-def glphyo_to_chromatic_tone_index(glyph,octave):
+def glypho_to_chromatic_tone_index(glyph,octave):
     assert(glyph.lower() in chromatic_glyphs)
     v = chromatic_glyphs.index( glyph.lower() ) % TONES_PER_CHROMATIC_OCTAVE
     o = octave
@@ -93,14 +93,14 @@ class Tone(BasicTone):
             index = index_or_glyph
             self.canonical = (index < TONES_PER_CHROMATIC_OCTAVE)
         else:
-            index = glphyo_to_chromatic_tone_index(index_or_glyph,octave)
+            index = glypho_to_chromatic_tone_index(index_or_glyph,octave)
             self.canonical = (octave == None)
         BasicTone.__init__(self,chromatic_tone_to_frequency(index))
         self._index = index
     @classmethod
     def fromGlypho(cls, glyph, octave=None ):
         """initializes a ChromaticTone from a glyph-octave pair"""
-        index = glphyo_to_chromatic_tone_index(glyph,octave)
+        index = glypho_to_chromatic_tone_index(glyph,octave)
         return cls(index)
     def get_index(self):
         return self._index
@@ -191,7 +191,10 @@ class SequenceNote(object):
         self.beat = float(beat)
         self.note = note
     def __cmp__(self,other):
-        return cmp(self.beat,other.beat)
+        return cmp(self.beat,other.beat) or cmp(self.note,other.note)
+
+def cmp_by_beat(a,b):
+        return cmp(a.beat,b.beat)
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 # Scale data
@@ -239,7 +242,7 @@ class Scale(object):
             for i in scale_index_offsets[self.name]:
                 self.tones.append(self.tonic + j*TONES_PER_CHROMATIC_OCTAVE + i)
     def get_glyphs(self):
-        return ([x.glyph for x in self.tones])
+        return [x.glyph for x in self.tones]
     glyphs = property(get_glyphs)
     def intersect(self,other):
         """return the number of notes that are the same in both scales"""
@@ -367,29 +370,41 @@ class Sequence(object):
     description of the tempo and time signature
     """
     def __init__(self,rhythm=None):
-        self._seq = []
-        self._rhythm = rhythm
-    def append(self,note):
+        self.seq = []
+        self.rhythm = rhythm
+    def append(self,note_or_seq):
         """Append a Note to the end of the current sequence"""
-        assert(type(note) == type(Note(Tone(0))))
-        try:
-            next_beat = self._seq[-1].beat + self._seq[-1].note.duration
-        except IndexError:
-            next_beat = 0
-        seq_note = SequenceNote(next_beat,note)
-        self._seq.append(seq_note)
-    def insert(self,note):
+        if(type(note_or_seq) == type(Note(Tone(0)))):
+            try:
+                next_beat = self.seq[-1].beat + self.seq[-1].note.duration
+            except IndexError:
+                next_beat = 0
+            seq_note = SequenceNote(next_beat,note_or_seq)
+            self.seq.append(seq_note)
+        else:
+            assert(type(note_or_seq) == type(Sequence()))
+            other = note_or_seq
+            rhythm_ratio = self.rhythm.beats_per_second / other.rhythm.beats_per_second
+            try:
+                next_beat = self.seq[-1].beat + self.seq[-1].note.duration*rhythm_ratio
+            except IndexError:
+                next_beat = 0
+            for seqnote in note_or_seq.seq:
+                new_note = SequenceNote(next_beat,Note(seqnote.note.tone,seqnote.note.duration*rhythm_ratio))
+                self.seq.append(new_note)
+                next_beat += new_note.note.duration
+    def insert(self,seqnote):
         """Insert a SequenceNote to the proper point"""
-        assert(type(note) == type(SequenceNote(Note(Tone(0)),0)))
-        self._seq.append(note)
-        self._seq.sort()
+        assert(type(seqnote) == type(SequenceNote(0.,Note(Tone(0)))))
+        self.seq.append(seqnote)
+        self.seq.sort(cmp_by_beat)
     def play(self,start_time,channel):
         # XXX can this be a variant of play_and_wait?
         """play this sequence through the channel asynchronously.  Send
         the notes and return."""
-        for seq_note in self._seq:
-            start = start_time + seq_note.beat/self._rhythm.beats_per_second
-            end   = start_time + (seq_note.beat + seq_note.note.duration)/self._rhythm.beats_per_second
+        for seq_note in self.seq:
+            start = start_time + seq_note.beat/self.rhythm.beats_per_second
+            end   = start_time + (seq_note.beat + seq_note.note.duration)/self.rhythm.beats_per_second
             channel.play_note(start, end,
                               seq_note.note.tone, seq_note.note.strength)
     def play_and_wait(self,start_time,channel):
@@ -397,9 +412,9 @@ class Sequence(object):
         dt = 1 # pass as parameter?
         processing_time = 0.1
         t1 = channel.now + dt - processing_time
-        for seq_note in self._seq:
-            start = start_time + seq_note.beat/self._rhythm.beats_per_second
-            end   = start_time + (seq_note.beat + seq_note.note.duration)/self._rhythm.beats_per_second
+        for seq_note in self.seq:
+            start = start_time + seq_note.beat/self.rhythm.beats_per_second
+            end   = start_time + (seq_note.beat + seq_note.note.duration)/self.rhythm.beats_per_second
             channel.play_note(start, end,
                               seq_note.note.tone, seq_note.note.strength)
             if end > t1:
@@ -412,7 +427,18 @@ class Sequence(object):
         if delta > 0:
             sleep(delta)
     def reverse(self):
-        tmax = self._seq[-1].beat
-        for n in self._seq:
+        tmax = self.seq[-1].beat
+        for n in self.seq:
             n.beat = tmax - n.beat
-        self._seq.sort()
+        self.seq.sort(cmp_by_beat)
+    def flip(self,scale=Scale(Tone('c',0),"chromatic",12)):
+        highest_tone = reduce(max,[x.note.tone for x in self.seq])
+        lowest_tone = reduce(min,[x.note.tone for x in self.seq])
+        max_index = scale.tones.index(highest_tone)
+        min_index = scale.tones.index(lowest_tone)
+        #print "highest",highest_tone,max_index
+        for i,sn in enumerate(self.seq):
+            new_index = max_index - scale.tones.index(sn.note.tone) + min_index
+            new_tone = scale.tones[new_index]
+            self.seq[i].note.tone = new_tone
+            
