@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #
-# circle_of_fifths - print out the circle of fifths
-#
-# Copyright (C) 2009 Roger Allen (rallen@gmail.com)
+# Copyright (C) 2010 Roger Allen (rallen@gmail.com)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,25 +17,22 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 #
-from ramu.music import *
+import sys
+sys.path.insert(0,"../../examples")
+sys.path.insert(0,"../..")
 
-def fifth(tone,name):
-    """given tone & scale name, return fifth.  CompSci counts from 0."""
-    return Scale(tone,name).tones[4]
+import circle_of_fifths
+circle_of_fifths.main()
 
-def main():
-    # starting note & scale
-    start_tone = Tone('f')
-    scale_name = 'major'
+import guitar_chords
+guitar_chords.main(['guitar_chords.py','stdout'])
 
-    # step by fifths around the circle
-    cur_tone = start_tone
-    print cur_tone
-    nxt_tone = fifth(cur_tone,scale_name)
-    while nxt_tone != start_tone:
-        cur_tone = nxt_tone
-        print cur_tone
-        nxt_tone = fifth(cur_tone,scale_name)
+import scale
+scale.main(['scale.py','stdout'])
 
-if __name__ == '__main__':
-    main()
+import scale_similarities
+scale_similarities.main(['scale_similarities.py','a','minor'])
+
+import twinkle
+twinkle.main(['twinkle.py','stdout'])
+

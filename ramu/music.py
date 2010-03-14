@@ -126,18 +126,8 @@ class Tone(BasicTone):
         return str(self)
     def __hash__(self):
         return hash(self.index)
-    def __eq__(self, other):
-        return self.index == other.index
-    def __ne__(self, other):
-        return self.index != other.index
-    def __gt__(self, other):
-        return self.index > other.index
-    def __ge__(self, other):
-        return self.index >= other.index
-    def __lt__(self, other):
-        return self.index < other.index
-    def __le__(self, other):
-        return self.index <= other.index
+    def __cmp__(self,other):
+        return cmp(self.index,other.index)
     def __add__(self, other):
         if type(other) == type(Tone(0)):
             offset = other.index
@@ -171,18 +161,8 @@ class Note(object):
         self.duration = float(duration)
         assert(0.0 <= strength <= 1.0)
         self.strength = float(strength)
-    def __eq__(self, other):
-        return self.tone == other.tone and self.duration == other.duration and self.strength == other.strength
-    def __ne__(self, other):
-        return not self == other
-    def __gt__(self, other):
-        return NotImplemented
-    def __ge__(self, other):
-        return NotImplemented
-    def __lt__(self, other):
-        return NotImplemented
-    def __le__(self, other):
-        return NotImplemented
+    def __cmp__(self,other):
+        return cmp(self.tone,other.tone) or cmp(self.duration,other.duration) or cmp(self.strength,other.strength)
 
 class SequenceNote(object):
     """A SequenceNote is a Note that has a start time in beats from the

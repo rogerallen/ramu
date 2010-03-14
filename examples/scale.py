@@ -22,7 +22,7 @@
 import sys
 from copy import deepcopy
 # uncomment to work with local directory
-sys.path.insert(0,"..")
+#sys.path.insert(0,"..")
 from ramu.music import *
 
 def usage():
@@ -33,36 +33,41 @@ def waitfor(s):
     sys.stdin.readline()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if len(sys.argv) != 2 or not sys.argv[1] in ["stdout", "midi"]:
-    usage()
-    exit()
+def main(argv):
+    if len(argv) != 2 or not argv[1] in ["stdout", "midi"]:
+        usage()
+        exit()
 
-do_midi = sys.argv[1] == "midi"
+    do_midi = argv[1] == "midi"
 
-if do_midi:
-    waitfor("Make sure GarageBand is running, then hit return")
-    from ramu.osxmidi.channel import Channel
-else:
-    from ramu.channel import Channel
-
-with Channel() as chn:
     if do_midi:
-        waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
+        waitfor("Make sure GarageBand is running, then hit return")
+        from ramu.osxmidi.channel import Channel
+    else:
+        from ramu.channel import Channel
 
-    the_scale = Scale(Tone('c',4),'dorian')
-    the_notes = [ Note(t,.5) for t in the_scale.tones ]
+    with Channel() as chn:
+        if do_midi:
+            waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 
-    seq = Sequence(Rhythm(120))
-    for t in the_notes:
-        seq.append(t)
-    rseq = deepcopy(seq)
-    fseq = deepcopy(seq)
-    rseq.reverse()
-    fseq.flip(the_scale)
+        the_scale = Scale(Tone('c',4),'dorian')
+        the_notes = [ Note(t,.5) for t in the_scale.tones ]
 
-    all = Sequence(Rhythm(120))
-    all.append(seq)
-    all.append(rseq)
-    all.append(seq)
-    all.append(fseq)
-    all.play_and_wait(chn.now,chn)
+        seq = Sequence(Rhythm(120))
+        for t in the_notes:
+            seq.append(t)
+        rseq = deepcopy(seq)
+        fseq = deepcopy(seq)
+        rseq.reverse()
+        fseq.flip(the_scale)
+
+        all = Sequence(Rhythm(120))
+        all.append(seq)
+        all.append(rseq)
+        all.append(seq)
+        all.append(fseq)
+        all.play_and_wait(chn.now,chn)
+
+if __name__ == '__main__':
+    main(sys.argv)
+        

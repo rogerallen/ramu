@@ -26,21 +26,25 @@ def usage():
     print "scale_similarities.py scale [name]"
     sys.exit(1)
 
-if len(sys.argv) < 2:
-    usage()
-base = sys.argv[1]
-if len(sys.argv) == 3:
-    name = sys.argv[2]
-else:
-    name = 'major'
-    
-s0 = Scale(Tone(base),name)
-similarities = []
-for i in range(12):
-   s1 = Scale(Tone(base)+i,name)
-   l = s0.intersect(s1)
-   similarities.append((len(l),l,s1.tonic))
+def main(argv):
+    if len(argv) < 2:
+        usage()
+    base = argv[1]
+    if len(argv) == 3:
+        name = argv[2]
+    else:
+        name = 'major'
+        
+    s0 = Scale(Tone(base),name)
+    similarities = []
+    for i in range(12):
+        s1 = Scale(Tone(base)+i,name)
+        l = s0.intersect(s1)
+        similarities.append((len(l),l,s1.tonic))
 
-for s in reversed(sorted(similarities)):
-   print "%2s %d %s" % (s[2],s[0],s[1])
+    for s in reversed(sorted(similarities)):
+        print "%2s %d %s" % (s[2],s[0],s[1])
     
+if __name__ == '__main__':
+    main(sys.argv)
+        
