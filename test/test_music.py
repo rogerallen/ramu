@@ -2,7 +2,8 @@
 import sys
 import unittest
 sys.path.insert(0,"..")
-from music import *
+from ramu.music import *
+from ramu.instruments.sequencer import SequenceNote,Sequence
 
 # ======================================================================
 class TestChord(unittest.TestCase):
@@ -93,10 +94,6 @@ class TestScale(unittest.TestCase):
 
 # ======================================================================
 class TestTone(unittest.TestCase):
-    def testBasic(self):
-        t = BasicTone(100.0)
-        self.assertEqual(100.0,t.frequency)
-
     def testA440(self):
         t = Tone(69)
         self.assertEqual(440.0,t.frequency)

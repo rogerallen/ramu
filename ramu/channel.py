@@ -102,4 +102,5 @@ class Channel:
     def __enter__(self):
         return self
     def __exit__(self, type, value, traceback):
+        self.all_notes_off()
         return False

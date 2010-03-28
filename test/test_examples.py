@@ -18,8 +18,8 @@
 # 02110-1301, USA.
 #
 import sys
-sys.path.insert(0,"../../examples")
-sys.path.insert(0,"../..")
+sys.path.insert(0,"../examples")
+sys.path.insert(0,"..")
 
 import circle_of_fifths
 circle_of_fifths.main()

@@ -1,5 +1,7 @@
 #!/usr/bin/make
 
+all: test coverage
+
 test:
 	./test_music.py
 
@@ -9,4 +11,7 @@ coverage:
 	coverage html
 	open htmlcov/index.html
 
-.PHONY: test coverage
+clean:
+	rm -rf .coverage htmlcov
+
+.PHONY: test coverage clean

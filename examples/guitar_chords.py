@@ -67,6 +67,9 @@ def main(argv):
             gtr.strum(t,1.0/16,direction,start_string)
             t += 1.0
             i += 1
+        gtr.mute(t)
+        gtr.strum(t,1.0/16,direction,start_string)
+        t += 1.0
         gtr.silence(t)
 
         if do_midi:

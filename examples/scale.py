@@ -22,8 +22,9 @@
 import sys
 from copy import deepcopy
 # uncomment to work with local directory
-#sys.path.insert(0,"..")
+sys.path.insert(0,"..")
 from ramu.music import *
+from ramu.instruments.sequencer import *
 
 def usage():
     print "playscale.py stdout|midi"

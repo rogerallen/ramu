@@ -16,3 +16,5 @@
 # 02110-1301, USA.
 #
 # blank
+#__path__=["..","."]
+#__all__=["guitar","sequencer"]
