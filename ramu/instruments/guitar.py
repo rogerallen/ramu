@@ -132,7 +132,7 @@ class FrettedString:
             self.moving = True
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
-class Guitar:
+class Guitar(object):
     # strings E, A, D, G, B, E
     string_notes = [ music.Tone('E',3),
                      music.Tone('A',3),
@@ -180,3 +180,40 @@ class Guitar:
             self.strings[i].pluck(time, strength)
             if self.strings[i].moving:
                 time += time_per_string
+
+class TwelveStringGuitar(object):
+    # twelve string guitar has 2nd set of strings, the first 4 being
+    # 1 octave higher than the normal guitar strings.  The last 2
+    # are in unison
+    second_string_notes = [ music.Tone('E',4),
+                            music.Tone('A',4),
+                            music.Tone('D',5),
+                            music.Tone('G',5),
+                            music.Tone('B',4),
+                            music.Tone('E',5) ]
+    def __init__(self, channel):
+        """create 2 guitars and override the 2nd guitar's strings"""
+        self.guitars = []
+        self.guitars.append(Guitar(channel))
+        self.guitars.append(Guitar(channel))
+        self.guitars[1].strings = [FrettedString(note,channel) for note in self.second_string_notes]
+    def press_fret(self, time, string_index, fret):
+        for g in self.guitars:
+            g.press_fret(time, string_index, fret)
+    def press_frets(self, time, frets):
+        for g in self.guitars:
+            g.press_frets(time, frets)
+    def press_chord(self, time, chord):
+        for g in self.guitars:
+            g.press_chord(time, chord)
+    def silence(self, time):
+        for g in self.guitars:
+            g.silence(time)
+    def mute(self,time):
+        for g in self.guitars:
+            g.mute(time)
+    def strum(self, time, time_per_string, direction=STRUM_DOWN,
+              start_string=0, num_strings=6, strength=0.80 ):
+        for g in self.guitars:
+            g.strum(time, time_per_string, direction, start_string, num_strings, strength)
+            time += time_per_string/2.0

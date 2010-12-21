@@ -53,24 +53,28 @@ def main(argv):
         if do_midi:
             waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 
-        gtr = guitar.Guitar(chn)
+        guitars = []
+        guitars.append(guitar.Guitar(chn))
+        guitars.append(guitar.TwelveStringGuitar(chn))
 
         t = chn.now
         i = 0
-        for c in [MajChord(x) for x in "E A D".split()]:
-            gtr.press_chord(t,c)
-            direction = guitar.STRUM_DOWN
-            start_string = 0
-            if i % 2:
-                direction = guitar.STRUM_UP
-                start_string = 5
+        for gtr in guitars:
+            for c in [MajChord(x) for x in "E A D".split()]:
+                gtr.press_chord(t,c)
+                direction = guitar.STRUM_DOWN
+                start_string = 0
+                if i % 2:
+                    direction = guitar.STRUM_UP
+                    start_string = 5
+                gtr.strum(t,1.0/16,direction,start_string)
+                t += 1.0
+                i += 1
+            gtr.mute(t)
             gtr.strum(t,1.0/16,direction,start_string)
             t += 1.0
-            i += 1
-        gtr.mute(t)
-        gtr.strum(t,1.0/16,direction,start_string)
-        t += 1.0
-        gtr.silence(t)
+            gtr.silence(t)
+            t += 0.5
 
         if do_midi:
             waitfor("hit return after the song is done (otherwise you'll mess up Garageband)")

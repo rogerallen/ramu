@@ -178,28 +178,283 @@ class Note(object):
 
 # name to chromatic index dictionary, one octave's worth of indices
 scale_index_offsets = {
-    # 12 tones per scale
-    "chromatic"         : [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ],
-    # 11,10,9,8 tones per scale ?
-    # 7 tones per scale (the normal major, minor scales)
-    "major"             : [ 0,    2,    4, 5,    7,    9,     11 ],
-    "ionian"            : [ 0,    2,    4, 5,    7,    9,     11 ],
-    "dorian"            : [ 0,    2, 3,    5,    7,    9, 10     ],
-    "phrygian"          : [ 0, 1,    3,    5,    7, 8,    10     ],
-    "lydian"            : [ 0,    2,    4,    6, 7,    9,     11 ],
-    "mixolydian"        : [ 0,    2,    4, 5,    7,    9, 10     ],
-    "minor"             : [ 0,    2, 3,    5,    7, 8,    10     ],
-    "natural minor"     : [ 0,    2, 3,    5,    7, 8,    10     ],
-    "melodic down minor": [ 0,    2, 3,    5,    7, 8,    10     ],
-    "aeolian"           : [ 0,    2, 3,    5,    7, 8,    10     ],
-    "harmonic minor"    : [ 0,    2, 3,    5,    7, 8,        11 ],
-    "melodic up minor"  : [ 0,    2, 3,    5,    7,    9,     11 ],
-    "locrian"           : [ 0, 1,    3,    5, 6,    8,    10     ],
-    # 6 notes per scale
-    "hexatonic"         : [ 0,    2,    4,    6,   8,     10     ],
-    "whole tone"        : [ 0,    2,    4,    6,   8,     10     ],
-    # 5 notes per scale
-    "pentatonic"        : [ 0,    2,       5,    7,    9 ],
+    # 5 notes
+    "pelog"                        : [0, 1, 3, 6, 10],
+
+    "balinese"                     : [0, 1, 3, 7, 8],
+
+    "japanese a"                   : [0, 1, 5, 7, 8],
+
+    "hirajoshi"                    : [0, 2, 3, 7, 8],
+
+    "kumoi"                        : [0, 2, 3, 7, 9],
+
+    "chinese mongolian"            : [0, 2, 4, 7, 9],
+    "diatonic"                     : [0, 2, 4, 7, 9],
+
+    "japanese b"                   : [0, 2, 5, 7, 8],
+
+    "pentatonic major"             : [0, 2, 5, 7, 9],
+
+    "egyptian"                     : [0, 2, 5, 7, 10],
+
+    "pentatonic minor"             : [0, 3, 5, 7, 10],
+
+    "chinese"                      : [0, 4, 6, 7, 11],
+
+    # 6 notes
+    "six tone symmetrical"         : [0, 1, 4, 5, 8, 9],
+
+    "prometheus neopolitan"        : [0, 1, 4, 6, 9, 10],
+
+    "auxiliary augmented"          : [0, 2, 4, 6, 8, 10],
+    "whole tone"                   : [0, 2, 4, 6, 8, 10],
+
+    "prometheus"                   : [0, 2, 4, 6, 9, 10],
+
+    "dominant 7th"                 : [0, 2, 5, 7, 9, 10],
+
+    "augmented"                    : [0, 3, 4, 7, 8, 11],
+
+    "blues"                        : [0, 3, 5, 6, 7, 10],
+
+    # 7 notes
+    "mela bhavapriya"              : [0, 1, 2, 5, 7, 8, 9],
+    "mela kanakangi"               : [0, 1, 2, 5, 7, 8, 9],
+
+    "mela ratnangi"                : [0, 1, 2, 5, 7, 8, 10],
+
+    "mela ganamurti"               : [0, 1, 2, 5, 7, 8, 11],
+
+    "mela vanaspati"               : [0, 1, 2, 5, 7, 9, 10],
+
+    "mela manavati"                : [0, 1, 2, 5, 7, 9, 11],
+
+    "mela tanarupi"                : [0, 1, 2, 5, 7, 10, 11],
+
+    "mela salagam"                 : [0, 1, 2, 6, 7, 8, 9],
+
+    "mela jalarnavam"              : [0, 1, 2, 6, 7, 8, 10],
+
+    "mela jhalavarali"             : [0, 1, 2, 6, 7, 8, 11],
+
+    "mela navanitam"               : [0, 1, 2, 6, 7, 9, 10],
+
+    "mela pavani"                  : [0, 1, 2, 6, 7, 9, 11],
+    "mela suvarnangi"              : [0, 1, 2, 6, 7, 9, 11],
+
+    "mela raghupriya"              : [0, 1, 2, 6, 7, 10, 11],
+
+    "diminished whole tone"        : [0, 1, 3, 4, 6, 8, 10],
+    "super locrian"                : [0, 1, 3, 4, 6, 8, 10],
+
+    "half diminished"              : [0, 1, 3, 5, 6, 8, 10],
+    "locrian"                      : [0, 1, 3, 5, 6, 8, 10],
+
+    "mela senavati"                : [0, 1, 3, 5, 7, 8, 9],
+
+    "bhairavi theta"               : [0, 1, 3, 5, 7, 8, 10],
+    "mela hanumattodi"             : [0, 1, 3, 5, 7, 8, 10],
+    "neopolitan minor"             : [0, 1, 3, 5, 7, 8, 10],
+    "phrygian"                     : [0, 1, 3, 5, 7, 8, 10],
+
+    "mela dhenuka"                 : [0, 1, 3, 5, 7, 8, 11],
+    "neopolitan"                   : [0, 1, 3, 5, 7, 8, 11],
+
+    "javaneese"                    : [0, 1, 3, 5, 7, 9, 10],
+    "mela natakapriya"             : [0, 1, 3, 5, 7, 9, 10],
+
+    "mela kokilapriya"             : [0, 1, 3, 5, 7, 9, 11],
+    "neoploitan major"             : [0, 1, 3, 5, 7, 9, 11],
+
+    "mela rupavati"                : [0, 1, 3, 5, 7, 10, 11],
+
+    "mela gavambodhi"              : [0, 1, 3, 6, 7, 8, 9],
+
+    "mela subhapantuvarali"        : [0, 1, 3, 6, 7, 8, 11],
+    "todi theta"                   : [0, 1, 3, 6, 7, 8, 11],
+
+    "mela sadvidhamargini"         : [0, 1, 3, 6, 7, 9, 10],
+
+    "mela divyamani"               : [0, 1, 3, 6, 7, 10, 11],
+
+    "oriental a"                   : [0, 1, 4, 5, 6, 8, 10],
+
+    "persian"                      : [0, 1, 4, 5, 6, 8, 11],
+
+    "oriental b"                   : [0, 1, 4, 5, 6, 9, 10],
+
+    "mela gayakapriya"             : [0, 1, 4, 5, 7, 8, 9],
+    "mela mayamalavagaula"         : [0, 1, 4, 5, 7, 8, 9],
+
+    "jewish ahaba rabba"           : [0, 1, 4, 5, 7, 8, 10],
+    "mela vakulabharanam"          : [0, 1, 4, 5, 7, 8, 10],
+    "spanish gypsy"                : [0, 1, 4, 5, 7, 8, 10],
+
+    "bhairav theta"                : [0, 1, 4, 5, 7, 8, 11],
+    "byzantine"                    : [0, 1, 4, 5, 7, 8, 11],
+    "double harmonic"              : [0, 1, 4, 5, 7, 8, 11],
+    "hungarian gypsy persian"      : [0, 1, 4, 5, 7, 8, 11],
+
+    "mela chakravakam"             : [0, 1, 4, 5, 7, 9, 10],
+
+    "mela suryakantam"             : [0, 1, 4, 5, 7, 9, 11],
+
+    "mela hatakambari"             : [0, 1, 4, 5, 7, 10, 11],
+
+    "mela dhavalambari"            : [0, 1, 4, 6, 7, 8, 9],
+
+    "mela namanarayani"            : [0, 1, 4, 6, 7, 8, 10],
+
+    "mela kamavardhani"            : [0, 1, 4, 6, 7, 8, 11],
+    "purvi theta"                  : [0, 1, 4, 6, 7, 8, 11],
+
+    "mela ramapriya"               : [0, 1, 4, 6, 7, 9, 10],
+
+    "marva theta"                  : [0, 1, 4, 6, 7, 9, 11],
+    "mela gamanasrama"             : [0, 1, 4, 6, 7, 9, 11],
+
+    "mela visvambari"              : [0, 1, 4, 6, 7, 10, 11],
+
+    "enigmatic"                    : [0, 1, 4, 6, 8, 10, 11],
+
+    "half diminished #2"           : [0, 2, 3, 5, 6, 8, 10],
+
+    "mela jhankaradhvani"          : [0, 2, 3, 5, 7, 8, 9],
+
+    "aeolian"                      : [0, 2, 3, 5, 7, 8, 10],
+    "asavari theta"                : [0, 2, 3, 5, 7, 8, 10],
+    "ethiopian geez & ezel"        : [0, 2, 3, 5, 7, 8, 10],
+    "mela natabhairavi"            : [0, 2, 3, 5, 7, 8, 10],
+    "pure minor"                   : [0, 2, 3, 5, 7, 8, 10],
+    "melodic down minor"           : [0, 2, 3, 5, 7, 8, 10],
+    "minor"                        : [0, 2, 3, 5, 7, 8, 10],
+
+    "harmonic minor"               : [0, 2, 3, 5, 7, 8, 11],
+    "mela kiravani"                : [0, 2, 3, 5, 7, 8, 11],
+    "mohammedan"                   : [0, 2, 3, 5, 7, 8, 11],
+
+    "dorian"                       : [0, 2, 3, 5, 7, 9, 10],
+    "kafi theta"                   : [0, 2, 3, 5, 7, 9, 10],
+    "mela kharaharapriya"          : [0, 2, 3, 5, 7, 9, 10],
+
+    "hawaiian"                     : [0, 2, 3, 5, 7, 9, 11],
+    "mela gaurimanohari"           : [0, 2, 3, 5, 7, 9, 11],
+    "melodic minor"                : [0, 2, 3, 5, 7, 9, 11],
+    "melodic up minor"             : [0, 2, 3, 5, 7, 9, 11],
+
+    "mela varunapriya"             : [0, 2, 3, 5, 7, 10, 11],
+
+    "mela syamalangi"              : [0, 2, 3, 6, 7, 8, 9],
+
+    "lydian diminished"            : [0, 2, 3, 6, 7, 8, 10],
+    "mela sanmukhapriya"           : [0, 2, 3, 6, 7, 8, 10],
+
+    "hungarian gypsy"              : [0, 2, 3, 6, 7, 8, 11],
+    "hungarian minor"              : [0, 2, 3, 6, 7, 8, 11],
+    "mela simhendramadhyama"       : [0, 2, 3, 6, 7, 8, 11],
+
+    "mela hemavati"                : [0, 2, 3, 6, 7, 9, 10],
+    "roumanian minor"              : [0, 2, 3, 6, 7, 9, 10],
+
+    "mela dharmavati"              : [0, 2, 3, 6, 7, 9, 11],
+
+    "mela nitimati"                : [0, 2, 3, 6, 7, 10, 11],
+
+    "arabian b"                    : [0, 2, 4, 5, 6, 8, 10],
+    "major locrian"                : [0, 2, 4, 5, 6, 8, 10],
+
+    "mela mararanjani"             : [0, 2, 4, 5, 7, 8, 9],
+
+    "hindu"                        : [0, 2, 4, 5, 7, 8, 10],
+    "hindustan"                    : [0, 2, 4, 5, 7, 8, 10],
+    "mela charukesi"               : [0, 2, 4, 5, 7, 8, 10],
+
+    "mela sarasangi"               : [0, 2, 4, 5, 7, 8, 11],
+
+    "khamaj theta"                 : [0, 2, 4, 5, 7, 9, 10],
+    "mela harikambhoji"            : [0, 2, 4, 5, 7, 9, 10],
+    "mixolydian"                   : [0, 2, 4, 5, 7, 9, 10],
+
+    "bilaval theta"                : [0, 2, 4, 5, 7, 9, 11],
+    "ethiopian a raray"            : [0, 2, 4, 5, 7, 9, 11],
+    "ionian"                       : [0, 2, 4, 5, 7, 9, 11],
+    "major"                        : [0, 2, 4, 5, 7, 9, 11],
+    "mela dhirasankarabharana"     : [0, 2, 4, 5, 7, 9, 11],
+
+    "mela naganandini"             : [0, 2, 4, 5, 7, 10, 11],
+
+    "mela kantamani"               : [0, 2, 4, 6, 7, 8, 9],
+
+    "lydian minor"                 : [0, 2, 4, 6, 7, 8, 10],
+    "mela risabhapriya"            : [0, 2, 4, 6, 7, 8, 10],
+
+    "mela latangi"                 : [0, 2, 4, 6, 7, 8, 11],
+
+    "mela vaschaspati"             : [0, 2, 4, 6, 7, 9, 10],
+    "overtone"                     : [0, 2, 4, 6, 7, 9, 10],
+    "overtone dominant"            : [0, 2, 4, 6, 7, 9, 10],
+
+    "kalyan theta"                 : [0, 2, 4, 6, 7, 9, 11],
+    "lydian"                       : [0, 2, 4, 6, 7, 9, 11],
+    "mela mechakalyani"            : [0, 2, 4, 6, 7, 9, 11],
+
+    "mela chitrambari"             : [0, 2, 4, 6, 7, 10, 11],
+
+    "leading whole tone"           : [0, 2, 4, 6, 8, 9, 10],
+
+    "lydian augmented"             : [0, 2, 4, 6, 8, 9, 11],
+
+    "mela yagapriya"               : [0, 3, 4, 5, 7, 8, 9],
+
+    "mela ragavardhani"            : [0, 3, 4, 5, 7, 8, 10],
+
+    "mela gangeyabhusani"          : [0, 3, 4, 5, 7, 8, 11],
+
+    "mela vagadhisvari"            : [0, 3, 4, 5, 7, 9, 10],
+
+    "mela sulini"                  : [0, 3, 4, 5, 7, 9, 11],
+
+    "mela chalanata"               : [0, 3, 4, 5, 7, 10, 11],
+
+    "mela sucharitra"              : [0, 3, 4, 6, 7, 8, 9],
+
+    "mela jyotisvarupini"          : [0, 3, 4, 6, 7, 8, 10],
+
+    "mela dhatuvardhani"           : [0, 3, 4, 6, 7, 8, 11],
+
+    "hungarian major"              : [0, 3, 4, 6, 7, 9, 10],
+    "mela nasikabhusani"           : [0, 3, 4, 6, 7, 9, 10],
+
+    "mela kosalam"                 : [0, 3, 4, 6, 7, 9, 11],
+
+    "mela rasikapriya"             : [0, 3, 4, 6, 7, 10, 11],
+
+    # 8 notes
+    "jewish adonai malakh"         : [0, 1, 2, 3, 5, 7, 9, 10],
+
+    "eight tone spanish"           : [0, 1, 3, 4, 5, 6, 8, 10],
+
+    "auxiliary diminished blues"   : [0, 1, 3, 4, 6, 7, 9, 10],
+
+    "jewish magen abot"            : [0, 1, 3, 4, 6, 8, 10, 11],
+
+    "algerian"                     : [0, 2, 3, 5, 6, 7, 8, 11],
+
+    "arabian a"                    : [0, 2, 3, 5, 6, 8, 9, 11],
+    "auxiliary diminished"         : [0, 2, 3, 5, 6, 8, 9, 11],
+    "diminished"                   : [0, 2, 3, 5, 6, 8, 9, 11],
+
+    "japanese ichikosucho"         : [0, 2, 4, 5, 6, 7, 9, 11],
+
+    # 9 notes
+    "nine tone scale"              : [0, 2, 3, 4, 6, 7, 8, 9, 11],
+
+    "japanese taishikicho"         : [0, 2, 4, 5, 6, 7, 9, 10, 11],
+
+    # 12 notes
+    "chromatic"                    : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+
     }
 
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

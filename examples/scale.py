@@ -51,7 +51,7 @@ def main(argv):
         if do_midi:
             waitfor("You should see Garageband notify you of a midi device. Hit return to continue.")
 
-        the_scale = Scale(Tone('c',4),'dorian')
+        the_scale = Scale(Tone('c#',4),'mela natakapriya')
         the_notes = [ Note(t,.5) for t in the_scale.tones ]
 
         seq = Sequence(Rhythm(120))
